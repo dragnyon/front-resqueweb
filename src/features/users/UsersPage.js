@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { getUsers, createUser, deleteUser, updateUser } from "../features/users/UserService";
-import UserList from "../features/users/UserList";
-import UserForm from "../features/users/UserForm";
+import { getUsers, createUser, deleteUser, updateUser } from "./UserService";
+import UserList from "./UserList";
+import UserForm from "./UserForm";
+import { Button, Container, Typography, TextField } from "@mui/material";
 
 const UsersPage = () => {
     const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
     const [search, setSearch] = useState("");
+    const [openUserForm, setOpenUserForm] = useState(false);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const data = await getUsers(); // 🔹 Récupère tous les utilisateurs (avec JWT)
+                const data = await getUsers();
                 setUsers(data);
             } catch (error) {
                 console.error("Erreur lors du chargement des utilisateurs :", error);
@@ -36,6 +38,7 @@ const UsersPage = () => {
         } catch (error) {
             console.error("Erreur lors de la création ou modification de l'utilisateur :", error);
         }
+        setOpenUserForm(false);
     };
 
     const handleDeleteUser = async (id) => {
@@ -47,12 +50,13 @@ const UsersPage = () => {
         }
     };
 
-    const handleEditUser = (user) => {
+    const handleOpenUserForm = (user = null) => {
         setEditingUser(user);
+        setOpenUserForm(true);
     };
 
-    const handleSearch = (e) => {
-        setSearch(e.target.value);
+    const handleSearch = (event) => {
+        setSearch(event.target.value);
     };
 
     const filteredUsers = users.filter((user) =>
@@ -60,20 +64,31 @@ const UsersPage = () => {
     );
 
     return (
-        <div>
-            <h1>Gestion des Utilisateurs</h1>
+        <Container>
+            <Typography variant="h4" gutterBottom>Gestion des Utilisateurs</Typography>
 
-            <input
-                type="text"
-                placeholder="Rechercher par email..."
+            <TextField
+                label="Rechercher un utilisateur par email"
+                variant="outlined"
+                fullWidth
+                margin="normal"
                 value={search}
                 onChange={handleSearch}
-                style={{ marginBottom: "20px", padding: "10px", width: "300px" }}
             />
 
-            <UserForm onSubmit={handleAddUser} initialData={editingUser} />
-            <UserList users={filteredUsers} onDelete={handleDeleteUser} onEdit={handleEditUser} />
-        </div>
+            <Button variant="contained" color="primary" onClick={() => handleOpenUserForm()}>
+                Ajouter un utilisateur
+            </Button>
+
+            <UserList users={filteredUsers} onDelete={handleDeleteUser} onEdit={handleOpenUserForm} />
+
+            <UserForm
+                onSubmit={handleAddUser}
+                initialData={editingUser}
+                open={openUserForm}
+                handleClose={() => setOpenUserForm(false)}
+            />
+        </Container>
     );
 };
 

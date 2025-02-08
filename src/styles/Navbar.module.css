@@ -1,0 +1,17 @@
+.navbar {
+    background-color: #1976d2 !important;
+}
+
+.title {
+    flex-grow: 1;
+}
+
+.logoutButton {
+    background-color: #e53935 !important;
+    color: white !important;
+    margin-left: auto;
+}
+
+.logoutButton:hover {
+    background-color: #c62828 !important;
+}

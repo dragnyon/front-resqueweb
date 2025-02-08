@@ -1,28 +1,23 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import UsersPage from "./UsersPage";
-import EntreprisesPage from "./EntreprisePage";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import UsersPage from "../features/users/UsersPage";
+import EntreprisesPage from "../features/entreprise/EntreprisePage";
+import { Container, Typography } from "@mui/material";
 
-function DashboardPage() {
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        localStorage.removeItem("token"); // Suppression du token
-        navigate("/login"); // Redirection vers la page de connexion
-    };
-
+const DashboardPage = () => {
     return (
-        <div>
-            <h1>Dashboard</h1>
-            <button onClick={handleLogout} style={{ marginBottom: "20px" }}>
-                Déconnexion
-            </button>
-            <div style={{ display: "flex", gap: "20px" }}>
-                <UsersPage />
-                <EntreprisesPage />
-            </div>
-        </div>
+        <>
+            <Navbar />
+            <Container>
+                <Routes>
+                    <Route path="/" element={<Typography variant="h4" align="center" marginTop={5}>Bienvenue sur le BackOffice</Typography>} />
+                    <Route path="/users" element={<UsersPage />} />
+                    <Route path="/entreprises" element={<EntreprisesPage />} />
+                </Routes>
+            </Container>
+        </>
     );
-}
+};
 
 export default DashboardPage;

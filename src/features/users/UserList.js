@@ -1,21 +1,38 @@
-import React from 'react';
+import React from "react";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from "@mui/material";
+import styles from "../../styles/List.module.css";
 
 const UserList = ({ users, onDelete, onEdit }) => {
     return (
-        <div>
-            <h2>Liste des utilisateurs</h2>
-            <ul>
-                {users.map((user) => (
-                    <li key={user.id}>
-                        <strong>Email :</strong> {user.email} |
-                        <strong> UUID :</strong> {user.id} |
-                        <strong> Entreprise :</strong> {user.entreprise || 'Aucune'}
-                        <button onClick={() => onDelete(user.id)}>Supprimer</button>
-                        <button onClick={() => onEdit(user)}>Modifier</button>
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <TableContainer component={Paper} className={styles.tableContainer}>
+            <Table>
+                <TableHead>
+                    <TableRow className={styles.tableHeader}>
+                        <TableCell>Email</TableCell>
+                        <TableCell>UUID</TableCell>
+                        <TableCell>Entreprise</TableCell>
+                        <TableCell>Actions</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {users.map((user) => (
+                        <TableRow key={user.id} className={styles.tableRow}>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.id}</TableCell>
+                            <TableCell>{user.entreprise || "Aucune"}</TableCell>
+                            <TableCell>
+                                <Button variant="contained" color="secondary" onClick={() => onEdit(user)} className={styles.editButton}>
+                                    Modifier
+                                </Button>
+                                <Button variant="contained" color="error" onClick={() => onDelete(user.id)} className={styles.deleteButton}>
+                                    Supprimer
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
 };
 

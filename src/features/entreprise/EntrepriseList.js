@@ -1,22 +1,40 @@
-import React from 'react';
+import React from "react";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from "@mui/material";
+import styles from "../../styles/List.module.css";
 
 const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
     return (
-        <div>
-            <h2>Liste des entreprise</h2>
-            <ul>
-                {entreprises.map((entreprise) => (
-                    <li key={entreprise.id}>
-                        <strong>Email :</strong> {entreprise.mail} |
-                        <strong> UUID :</strong> {entreprise.id} |
-                        <strong> Adresse :</strong> {entreprise.adresse} |
-                        <strong> Abonnement :</strong> {entreprise.abonnement} |
-                        <button onClick={() => onDelete(entreprise.id)}>Supprimer</button>
-                        <button onClick={() => onEdit(entreprise)}>Modifier</button>
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <TableContainer component={Paper} className={styles.tableContainer}>
+            <Table>
+                <TableHead>
+                    <TableRow className={styles.tableHeader}>
+                        <TableCell>Email</TableCell>
+                        <TableCell>UUID</TableCell>
+                        <TableCell>Adresse</TableCell>
+                        <TableCell>Abonnement</TableCell>
+                        <TableCell>Actions</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {entreprises.map((entreprise) => (
+                        <TableRow key={entreprise.id} className={styles.tableRow}>
+                            <TableCell>{entreprise.mail}</TableCell>
+                            <TableCell>{entreprise.id}</TableCell>
+                            <TableCell>{entreprise.adresse || "N/A"}</TableCell>
+                            <TableCell>{entreprise.abonnement || "N/A"}</TableCell>
+                            <TableCell>
+                                <Button variant="contained" color="secondary" onClick={() => onEdit(entreprise)} className={styles.editButton}>
+                                    Modifier
+                                </Button>
+                                <Button variant="contained" color="error" onClick={() => onDelete(entreprise.id)} className={styles.deleteButton}>
+                                    Supprimer
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
 };
 
