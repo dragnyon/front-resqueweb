@@ -6,7 +6,7 @@ import styles from "../styles/Navbar.module.css";
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const { logout } = useContext(AuthContext);
+    const { logout, userType } = useContext(AuthContext);
 
     return (
         <AppBar position="static" className={styles.navbar}>
@@ -16,8 +16,20 @@ const Navbar = () => {
                         BackOffice
                     </Typography>
                     <Button color="inherit" onClick={() => navigate("/dashboard")}>Accueil</Button>
-                    <Button color="inherit" onClick={() => navigate("/dashboard/users")}>Utilisateurs</Button>
-                    <Button color="inherit" onClick={() => navigate("/dashboard/entreprises")}>Entreprises</Button>
+
+                    {/* 🔹 ADMIN voit seulement "Utilisateurs" */}
+                    {userType === "ADMIN" && (
+                        <Button color="inherit" onClick={() => navigate("/dashboard/users")}>Utilisateurs</Button>
+                    )}
+
+                    {/* 🔹 SUPER_ADMIN voit tout */}
+                    {userType === "SUPER_ADMIN" && (
+                        <>
+                            <Button color="inherit" onClick={() => navigate("/dashboard/users")}>Utilisateurs</Button>
+                            <Button color="inherit" onClick={() => navigate("/dashboard/entreprises")}>Entreprises</Button>
+                        </>
+                    )}
+
                     <Button color="inherit" className={styles.logoutButton} onClick={logout}>
                         Déconnexion
                     </Button>

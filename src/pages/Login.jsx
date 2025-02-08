@@ -9,16 +9,25 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const { login } = useContext(AuthContext); // 🔹 Appel du contexte pour gérer la connexion
-    useNavigate();
+    const { login } = useContext(AuthContext);
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
 
-
         try {
             const response = await axios.post("http://localhost:8080/api/auth/login", { email, password });
-            login(response.data.token); // 🔹 Appel de login() pour stocker le token et rediriger
+
+            const { token, typeUtilisateur } = response.data;
+
+            // 🔹 Vérifier si l'utilisateur a le droit de se connecter
+            if (typeUtilisateur === "USER") {
+                setError("Accès interdit !");
+                return;
+            }
+
+            login(token, typeUtilisateur); // 🔹 Stocke les infos et redirige
         } catch (err) {
             setError("Email ou mot de passe incorrect !");
         }

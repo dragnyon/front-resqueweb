@@ -4,28 +4,38 @@ import { useNavigate } from "react-router-dom";
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
     const navigate = useNavigate();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userType, setUserType] = useState(null);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        setIsAuthenticated(!!token);
+        const typeUtilisateur = localStorage.getItem("typeUtilisateur");
+
+        if (token) {
+            setIsAuthenticated(true);
+            setUserType(typeUtilisateur);
+        }
     }, []);
 
-    const login = (token) => {
+    const login = (token, typeUtilisateur) => {
         localStorage.setItem("token", token);
+        localStorage.setItem("typeUtilisateur", typeUtilisateur);
         setIsAuthenticated(true);
-        navigate("/dashboard"); // 🔹 Redirection immédiate après connexion
+        setUserType(typeUtilisateur);
+        navigate("/dashboard");
     };
 
     const logout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("typeUtilisateur");
         setIsAuthenticated(false);
-        navigate("/login"); // 🔹 Redirection après déconnexion
+        setUserType(null);
+        navigate("/login");
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, userType, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
