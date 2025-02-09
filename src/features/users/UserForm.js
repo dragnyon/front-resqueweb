@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Button, Typography, Modal, Box, Paper } from "@mui/material";
+import { TextField, Button, Typography, Modal, Box, Paper, Autocomplete, MenuItem, Select } from "@mui/material";
 import styles from "../../styles/Form.module.css";
+import { getEntreprises } from "../entreprise/EntrepriseService";
 
 const modalStyle = {
     position: "absolute",
@@ -17,23 +18,52 @@ const modalStyle = {
 const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [entreprise, setEntreprise] = useState("");
+    const [typeUtilisateur, setTypeUtilisateur] = useState("USER");
+    const [entreprises, setEntreprises] = useState([]);  // Liste des entreprises
+    const [selectedEntreprise, setSelectedEntreprise] = useState(null); // Entreprise sélectionnée
+    const [autocompleteOpen, setAutocompleteOpen] = useState(false); // Gère l'ouverture de l'Autocomplete
+
+    useEffect(() => {
+        // Charger la liste des entreprises depuis l'API
+        const fetchEntreprises = async () => {
+            try {
+                const entreprisesData = await getEntreprises();
+                setEntreprises(entreprisesData);
+            } catch (error) {
+                console.error("Erreur lors de la récupération des entreprises :", error);
+            }
+        };
+
+        fetchEntreprises();
+    }, []);
 
     useEffect(() => {
         if (initialData) {
             setEmail(initialData.email);
             setPassword(initialData.password);
-            setEntreprise(initialData.entreprise || "");
+            setTypeUtilisateur(initialData.typeUtilisateur);
+
+            // Sélectionner automatiquement l'entreprise si elle existe
+            if (entreprises.length > 0) {
+                const entrepriseExistante = entreprises.find(e => e.id === initialData.entreprise);
+                setSelectedEntreprise(entrepriseExistante || null);
+            }
         } else {
             setEmail("");
             setPassword("");
-            setEntreprise("");
+            setTypeUtilisateur("USER");
+            setSelectedEntreprise(null);
         }
-    }, [initialData, open]);
+    }, [initialData, open, entreprises]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit({ email, password, entreprise: entreprise.trim() === "" ? null : entreprise });
+        onSubmit({
+            email,
+            password,
+            entreprise: selectedEntreprise ? selectedEntreprise.id : null,
+            typeUtilisateur,
+        });
         handleClose();
     };
 
@@ -44,9 +74,51 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
                     {initialData ? "Modifier" : "Ajouter"} un utilisateur
                 </Typography>
                 <form onSubmit={handleSubmit} className={styles.formContainer}>
-                    <TextField fullWidth label="Email" type="email" margin="normal" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                    <TextField fullWidth label="Mot de passe" type="password" margin="normal" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                    <TextField fullWidth label="UUID de l'entreprise (optionnel)" margin="normal" value={entreprise} onChange={(e) => setEntreprise(e.target.value)} />
+                    <TextField
+                        fullWidth
+                        label="Email"
+                        type="email"
+                        margin="normal"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                    <TextField
+                        fullWidth
+                        label="Mot de passe"
+                        type="password"
+                        margin="normal"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+
+                    {/* Autocomplete pour sélectionner une entreprise */}
+                    <Autocomplete
+                        options={entreprises}
+                        getOptionLabel={(option) => option.mail || ""}
+                        value={selectedEntreprise}
+                        open={autocompleteOpen} // 🔹 Ouvre automatiquement la liste
+                        onOpen={() => setAutocompleteOpen(true)} // 🔹 Ouvre la liste au focus
+                        onClose={() => setAutocompleteOpen(false)}
+                        onChange={(event, newValue) => setSelectedEntreprise(newValue)}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Sélectionner une entreprise (Email)" margin="normal" fullWidth />
+                        )}
+                    />
+
+                    {/* Sélection du type d'utilisateur */}
+                    <Select
+                        fullWidth
+                        margin="normal"
+                        value={typeUtilisateur}
+                        onChange={(e) => setTypeUtilisateur(e.target.value)}
+                    >
+                        <MenuItem value="SUPER_ADMIN">SUPER_ADMIN</MenuItem>
+                        <MenuItem value="ADMIN">ADMIN</MenuItem>
+                        <MenuItem value="USER">USER</MenuItem>
+                    </Select>
+
                     <Button type="submit" variant="contained" color="primary" fullWidth className={styles.submitButton}>
                         {initialData ? "Modifier" : "Ajouter"}
                     </Button>
