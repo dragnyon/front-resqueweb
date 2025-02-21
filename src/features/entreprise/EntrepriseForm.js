@@ -16,6 +16,7 @@ const modalStyle = {
 
 const EntrepriseForm = ({ onSubmit, initialData, open, handleClose }) => {
     const [mail, setMail] = useState("");
+    const [name, setName] = useState("");
     const [password, setPassword] = useState("");
     const [abonnement, setAbonnement] = useState("");
     const [adresse, setAdresse] = useState("");
@@ -23,11 +24,13 @@ const EntrepriseForm = ({ onSubmit, initialData, open, handleClose }) => {
     useEffect(() => {
         if (initialData) {
             setMail(initialData.mail);
+            setName(initialData.name);
             setPassword(initialData.password);
             setAbonnement(initialData.abonnement || "");
             setAdresse(initialData.adresse || "");
         } else {
             setMail("");
+            setName("");
             setPassword("");
             setAbonnement("");
             setAdresse("");
@@ -36,7 +39,7 @@ const EntrepriseForm = ({ onSubmit, initialData, open, handleClose }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit({ mail, password, abonnement: abonnement.trim() === "" ? null : abonnement, adresse: adresse.trim() === "" ? null : adresse });
+        onSubmit({ mail, name, password, abonnement: abonnement.trim() === "" ? null : abonnement, adresse: adresse.trim() === "" ? null : adresse });
         handleClose();
     };
 
@@ -48,9 +51,11 @@ const EntrepriseForm = ({ onSubmit, initialData, open, handleClose }) => {
                 </Typography>
                 <form onSubmit={handleSubmit} className={styles.formContainer}>
                     <TextField fullWidth label="Email" type="email" margin="normal" value={mail} onChange={(e) => setMail(e.target.value)} required />
+                    <TextField fullWidth label="Nom" margin="normal" value={name} onChange={(e) => setName(e.target.value)} required />
                     <TextField fullWidth label="Mot de passe" type="password" margin="normal" value={password} onChange={(e) => setPassword(e.target.value)} required />
                     <TextField fullWidth label="UUID de l'abonnement (optionnel)" margin="normal" value={abonnement} onChange={(e) => setAbonnement(e.target.value)} />
-                    <TextField fullWidth label="Adresse (optionnel)" margin="normal" value={adresse} onChange={(e) => setAdresse(e.target.value)} />
+                    <TextField fullWidth label="Adresse (optionnel)" margin="normal" value={adresse} onChange={(e) => setAdresse(e.target.value)} required />
+
                     <Button type="submit" variant="contained" color="primary" fullWidth className={styles.submitButton}>
                         {initialData ? "Modifier" : "Ajouter"}
                     </Button>

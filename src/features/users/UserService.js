@@ -23,3 +23,9 @@ export const deleteUser = async (uuid) => {
     const response = await api.delete(`/utilisateurs/${uuid}`);
     return response.data;
 };
+
+
+export const getUsersByCompany = async () => {
+    const response = await api.get("/utilisateurs/getbycompany");
+    return response.data;
+};

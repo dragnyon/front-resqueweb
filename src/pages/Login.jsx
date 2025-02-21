@@ -44,6 +44,14 @@ const Login = () => {
                     <Button type="submit" variant="contained" className={styles.loginButton}>Se Connecter</Button>
                 </form>
             </Paper>
+            <Button
+                onClick={() => navigate("/register")}
+                variant="contained"
+                color="primary"
+                className={styles.registerRedirect}
+            >
+                S'inscrire
+            </Button>
         </Container>
     );
 };

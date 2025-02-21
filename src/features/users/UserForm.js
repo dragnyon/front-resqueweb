@@ -17,6 +17,8 @@ const modalStyle = {
 
 const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
     const [email, setEmail] = useState("");
+    const [nom, setNom] = useState("");
+    const [prenom, setPrenom] = useState("");
     const [password, setPassword] = useState("");
     const [typeUtilisateur, setTypeUtilisateur] = useState("USER");
     const [entreprises, setEntreprises] = useState([]);  // Liste des entreprises
@@ -42,6 +44,8 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
             setEmail(initialData.email);
             setPassword(initialData.password);
             setTypeUtilisateur(initialData.typeUtilisateur);
+            setNom(initialData.nom);
+            setPrenom(initialData.prenom);
 
             // Sélectionner automatiquement l'entreprise si elle existe
             if (entreprises.length > 0) {
@@ -50,6 +54,8 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
             }
         } else {
             setEmail("");
+            setNom("");
+            setPrenom("");
             setPassword("");
             setTypeUtilisateur("USER");
             setSelectedEntreprise(null);
@@ -60,6 +66,8 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
         e.preventDefault();
         onSubmit({
             email,
+            nom,
+            prenom,
             password,
             entreprise: selectedEntreprise ? selectedEntreprise.id : null,
             typeUtilisateur,
@@ -83,6 +91,27 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                     />
+
+                    <TextField
+                        fullWidth
+                        label="Nom"
+                        type="text"
+                        margin="normal"
+                        value={nom}
+                        onChange={(e) => setNom(e.target.value)}
+                        required
+                    />
+
+                    <TextField
+                        fullWidth
+                        label="Prénom"
+                        type="text"
+                        margin="normal"
+                        value={prenom}
+                        onChange={(e) => setPrenom(e.target.value)}
+                        required
+                    />
+
                     <TextField
                         fullWidth
                         label="Mot de passe"
@@ -119,9 +148,13 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
                         <MenuItem value="USER">USER</MenuItem>
                     </Select>
 
+                    {/* Bouton de soumission */}
+
                     <Button type="submit" variant="contained" color="primary" fullWidth className={styles.submitButton}>
                         {initialData ? "Modifier" : "Ajouter"}
                     </Button>
+
+
                 </form>
             </Box>
         </Modal>

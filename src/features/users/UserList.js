@@ -10,7 +10,10 @@ const UserList = ({ users, onDelete, onEdit }) => {
                     <TableRow className={styles.tableHeader}>
                         <TableCell>Email</TableCell>
                         <TableCell>UUID</TableCell>
+                        <TableCell>Nom</TableCell>
+                        <TableCell>Prénom</TableCell>
                         <TableCell>Entreprise</TableCell>
+                        <TableCell>Type</TableCell>
                         <TableCell>Actions</TableCell>
                     </TableRow>
                 </TableHead>
@@ -19,6 +22,9 @@ const UserList = ({ users, onDelete, onEdit }) => {
                         <TableRow key={user.id} className={styles.tableRow}>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.id}</TableCell>
+                            <TableCell>{user.nom}</TableCell>
+                            <TableCell>{user.prenom}</TableCell>
+                            <TableCell>{user.typeUtilisateur}</TableCell>
                             <TableCell>{user.entreprise || "Aucune"}</TableCell>
                             <TableCell>
                                 <Button variant="contained" color="secondary" onClick={() => onEdit(user)} className={styles.editButton}>

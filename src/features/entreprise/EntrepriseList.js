@@ -9,6 +9,7 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                 <TableHead>
                     <TableRow className={styles.tableHeader}>
                         <TableCell>Email</TableCell>
+                        <TableCell>Nom</TableCell>
                         <TableCell>UUID</TableCell>
                         <TableCell>Adresse</TableCell>
                         <TableCell>Abonnement</TableCell>
@@ -19,6 +20,7 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                     {entreprises.map((entreprise) => (
                         <TableRow key={entreprise.id} className={styles.tableRow}>
                             <TableCell>{entreprise.mail}</TableCell>
+                            <TableCell>{entreprise.name}</TableCell>
                             <TableCell>{entreprise.id}</TableCell>
                             <TableCell>{entreprise.adresse || "N/A"}</TableCell>
                             <TableCell>{entreprise.abonnement || "N/A"}</TableCell>

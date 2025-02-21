@@ -1,27 +1,34 @@
-import React, { useEffect, useState } from "react";
-import { getUsers, createUser, deleteUser, updateUser } from "./UserService";
+import React, {useContext, useEffect, useState} from "react";
+import {getUsers, createUser, deleteUser, updateUser, getUsersByCompany} from "./UserService";
 import UserList from "./UserList";
 import UserForm from "./UserForm";
 import { Button, Container, Typography, TextField } from "@mui/material";
+import {AuthContext} from "../../context/AuthContext";
 
 const UsersPage = () => {
     const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
     const [search, setSearch] = useState("");
     const [openUserForm, setOpenUserForm] = useState(false);
+    const { userType } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const data = await getUsers();
+                let data;
+                // Par exemple, pour un admin, on récupère uniquement ceux de sa compagnie
+                if (userType === "ADMIN") {
+                    data = await getUsersByCompany();
+                } else {
+                    data = await getUsers();
+                }
                 setUsers(data);
             } catch (error) {
                 console.error("Erreur lors du chargement des utilisateurs :", error);
             }
         };
-
         fetchUsers();
-    }, []);
+    }, [userType]);
 
     const handleAddUser = async (userData) => {
         try {

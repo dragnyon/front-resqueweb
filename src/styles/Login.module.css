@@ -31,3 +31,8 @@
 .loginButton:hover {
     background-color: #115293;
 }
+
+
+.registerRedirect:hover {
+    text-decoration: underline;
+}
