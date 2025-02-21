@@ -1,13 +1,13 @@
 import React, { useContext } from "react";
-import {AppBar, Toolbar, Typography, Button, Container} from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import styles from "../styles/Navbar.module.css";
 
-
 const Navbar = () => {
     const navigate = useNavigate();
-    const { logout, userType } = useContext(AuthContext);
+    const { logout, userInfo } = useContext(AuthContext);
+    const userType = userInfo?.typeUtilisateur; // Extraction du type depuis userInfo
 
     return (
         <AppBar position="static" className={styles.navbar}>
@@ -16,19 +16,29 @@ const Navbar = () => {
                     <Typography variant="h6" className={styles.title}>
                         ResqueWay
                     </Typography>
-                    <Button color="inherit" onClick={() => navigate("/dashboard")}>Accueil</Button>
+                    <Button color="inherit" onClick={() => navigate("/dashboard")}>
+                        Accueil
+                    </Button>
 
-                    {/* 🔹 ADMIN voit seulement "Utilisateurs" */}
+                    {/* ADMIN voit seulement "Utilisateurs" */}
                     {userType === "ADMIN" && (
-                        <Button color="inherit" onClick={() => navigate("/dashboard/users")}>Utilisateurs</Button>
+                        <Button color="inherit" onClick={() => navigate("/dashboard/users")}>
+                            Utilisateurs
+                        </Button>
                     )}
 
-                    {/* 🔹 SUPER_ADMIN voit tout */}
+                    {/* SUPER_ADMIN voit tout */}
                     {userType === "SUPER_ADMIN" && (
                         <>
-                            <Button color="inherit" onClick={() => navigate("/dashboard/users")}>Utilisateurs</Button>
-                            <Button color="inherit" onClick={() => navigate("/dashboard/abonnements")}>Abonnements</Button>
-                            <Button color="inherit" onClick={() => navigate("/dashboard/entreprises")}>Entreprises</Button>
+                            <Button color="inherit" onClick={() => navigate("/dashboard/users")}>
+                                Utilisateurs
+                            </Button>
+                            <Button color="inherit" onClick={() => navigate("/dashboard/abonnements")}>
+                                Abonnements
+                            </Button>
+                            <Button color="inherit" onClick={() => navigate("/dashboard/entreprises")}>
+                                Entreprises
+                            </Button>
                         </>
                     )}
 

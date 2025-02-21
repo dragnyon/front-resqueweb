@@ -12,10 +12,19 @@ const DashboardPage = () => {
             <Navbar />
             <Container>
                 <Routes>
-                    <Route path="/" element={<Typography variant="h4" align="center" marginTop={5}>Bienvenue sur votre espace administrateur</Typography>} />
-                    <Route path="/users" element={<UsersPage />} />
-                    <Route path="/entreprises" element={<EntreprisesPage />} />
-                    <Route path="/abonnements" element={<AbonnementsPage />} />
+                    {/* Route par défaut de "/dashboard" */}
+                    <Route
+                        index
+                        element={
+                            <Typography variant="h4" align="center" marginTop={5}>
+                                Bienvenue sur votre espace administrateur
+                            </Typography>
+                        }
+                    />
+                    {/* Routes relatives */}
+                    <Route path="users" element={<UsersPage />} />
+                    <Route path="entreprises" element={<EntreprisesPage />} />
+                    <Route path="abonnements" element={<AbonnementsPage />} />
                 </Routes>
             </Container>
         </>

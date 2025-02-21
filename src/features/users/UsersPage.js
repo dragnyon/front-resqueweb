@@ -1,22 +1,25 @@
-import React, {useContext, useEffect, useState} from "react";
-import {getUsers, createUser, deleteUser, updateUser, getUsersByCompany} from "./UserService";
+// src/pages/UsersPage.js
+import React, { useContext, useEffect, useState } from "react";
+import { getUsers, createUser, deleteUser, updateUser, getUsersByCompany } from "./UserService";
 import UserList from "./UserList";
 import UserForm from "./UserForm";
 import { Button, Container, Typography, TextField } from "@mui/material";
-import {AuthContext} from "../../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 
 const UsersPage = () => {
     const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
     const [search, setSearch] = useState("");
     const [openUserForm, setOpenUserForm] = useState(false);
-    const { userType } = useContext(AuthContext);
+
+    // Récupère userInfo depuis le contexte et en extrait le type d'utilisateur
+    const { userInfo } = useContext(AuthContext);
+    const userType = userInfo?.typeUtilisateur;
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 let data;
-                // Par exemple, pour un admin, on récupère uniquement ceux de sa compagnie
                 if (userType === "ADMIN") {
                     data = await getUsersByCompany();
                 } else {
@@ -72,7 +75,9 @@ const UsersPage = () => {
 
     return (
         <Container>
-            <Typography variant="h4" gutterBottom>Gestion des Utilisateurs</Typography>
+            <Typography variant="h4" gutterBottom>
+                Gestion des Utilisateurs
+            </Typography>
 
             <TextField
                 label="Rechercher un utilisateur par email"
