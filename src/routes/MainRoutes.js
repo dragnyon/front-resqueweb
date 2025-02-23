@@ -1,5 +1,6 @@
+// src/routes/MainRoutes.js
+import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Login from "../pages/Login";
@@ -14,7 +15,7 @@ const MainRoutes = () => {
             <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
             <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />} />
 
-            {/* 🔹 Protéger tout le Dashboard, mais sans cacher la Navbar */}
+            {/* Protège le back office uniquement pour ADMIN et SUPER_ADMIN */}
             <Route element={<ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]} />}>
                 <Route path="/dashboard/*" element={<DashboardPage />} />
             </Route>

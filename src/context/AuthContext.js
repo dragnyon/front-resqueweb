@@ -11,7 +11,7 @@ const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
 
-    // Au chargement, on essaie de récupérer /auth/me pour voir si le cookie JWT est valide
+    // Au chargement, on vérifie si le cookie JWT est valide via /auth/me
     useEffect(() => {
         api.get("/auth/me")
             .then((res) => {
@@ -25,17 +25,20 @@ const AuthProvider = ({ children }) => {
     }, []);
 
     // Fonction login centralisée
-    const login = async (email, password) => {
-        // Appel au login pour déposer le cookie JWT
-        await api.post("/auth/login", { email, password });
+    // On envoie également le champ clientType (défini par défaut sur "backoffice")
+    const login = async (email, password, clientType = "backoffice") => {
+        try {
+            // Tentative d'appel au login pour déposer le cookie JWT
+            await api.post("/auth/login", { email, password, clientType });
+        } catch (error) {
+            // Si le serveur retourne un 403, on transmet l'erreur avec le message renvoyé
+            if (error.response && error.response.status === 403) {
+                throw new Error(error.response.data || "Accès interdit !");
+            }
+            throw error;
+        }
         // Récupération des infos utilisateur via /auth/me
         const meResp = await api.get("/auth/me");
-        // Vérification du type utilisateur
-        if (meResp.data.typeUtilisateur === "USER") {
-            // Si l'utilisateur n'a pas le droit d'accéder (ex : accès interdit)
-            throw new Error("Accès interdit !");
-        }
-        // Sinon, on met à jour l'état global et on redirige
         setIsAuthenticated(true);
         setUserInfo(meResp.data);
         navigate("/dashboard");

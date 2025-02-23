@@ -1,3 +1,4 @@
+// src/components/Navbar.js
 import React, { useContext } from "react";
 import { AppBar, Toolbar, Typography, Button, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ import styles from "../styles/Navbar.module.css";
 const Navbar = () => {
     const navigate = useNavigate();
     const { logout, userInfo } = useContext(AuthContext);
-    const userType = userInfo?.typeUtilisateur; // Extraction du type depuis userInfo
+    const userType = userInfo?.typeUtilisateur; // Extraction du rôle depuis userInfo
 
     return (
         <AppBar position="static" className={styles.navbar}>

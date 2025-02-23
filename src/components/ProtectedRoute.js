@@ -12,18 +12,16 @@ const ProtectedRoute = ({ allowedRoles }) => {
         return <Navigate to="/login" />;
     }
 
-    // Si le type d'utilisateur n'est pas encore chargé, on peut afficher un loader
-    if (userType === null) {
+    // Tant que le rôle n'est pas chargé, afficher un loader
+    if (!userType) {
         return <div>Loading...</div>;
     }
 
-    // Si des rôles autorisés sont définis et que le type d'utilisateur n'est pas autorisé,
-    // on redirige vers /dashboard (ou une page d'erreur selon votre logique)
+    // Si des rôles autorisés sont définis et que le rôle de l'utilisateur ne figure pas dans la liste, redirige vers /dashboard
     if (allowedRoles && !allowedRoles.includes(userType)) {
         return <Navigate to="/dashboard" />;
     }
 
-    // Sinon, on rend les enfants via Outlet
     return <Outlet />;
 };
 
