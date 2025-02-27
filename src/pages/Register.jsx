@@ -1,92 +1,162 @@
+// src/pages/Register.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Button, Typography, Paper, RadioGroup, FormControlLabel, Radio, Alert } from "@mui/material";
+import {
+    Container,
+    Button,
+    Typography,
+    Paper,
+    RadioGroup,
+    FormControlLabel,
+    Radio,
+    Alert,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
 import UserForm from "../features/users/UserForm";
 import EntrepriseForm from "../features/entreprise/EntrepriseForm";
 import { createEntreprise } from "../features/entreprise/EntrepriseService";
 import { createUser } from "../features/users/UserService";
-import styles from "../styles/Register.module.css";
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(4),
+    borderRadius: theme.spacing(2),
+    textAlign: "center",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+}));
+
+const GradientTitle = styled(Typography)(({ theme }) => ({
+    background: "linear-gradient(90deg, #4b6cb7, #182848)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    fontWeight: 700,
+    marginBottom: theme.spacing(2),
+}));
+
+const ModernButton = styled(Button)(({ theme }) => ({
+    marginTop: theme.spacing(2),
+    padding: theme.spacing(1.5),
+    borderRadius: theme.spacing(1),
+    fontSize: "1rem",
+    fontWeight: 500,
+    background: "linear-gradient(45deg, #4b6cb7, #182848)",
+    color: "#fff",
+    boxShadow: "0 3px 5px rgba(25,118,210,0.3)",
+    transition: "transform 0.3s, box-shadow 0.3s",
+    "&:hover": {
+        transform: "scale(1.05)",
+        boxShadow: "0 6px 10px rgba(0,0,0,0.3)",
+    },
+}));
 
 const Register = () => {
     const [userType, setUserType] = useState(""); // "USER" ou "ENTREPRISE"
-    const [entrepriseData, setEntrepriseData] = useState(null); // Stocke les données de l'entreprise
-    const [isRegistered, setIsRegistered] = useState(false); // Pour afficher le message de confirmation
+    const [enterpriseData, setEnterpriseData] = useState(null); // Stocke les données du formulaire Entreprise
+    const [userData, setUserData] = useState(null); // Stocke les données du formulaire Utilisateur
+    const [isRegistered, setIsRegistered] = useState(false);
+    const [openEnterpriseModal, setOpenEnterpriseModal] = useState(false);
+    const [openUserModal, setOpenUserModal] = useState(false);
     const navigate = useNavigate();
 
     const handleUserTypeChange = (event) => {
         setUserType(event.target.value);
-        setEntrepriseData(null); // Réinitialise les données d'entreprise en cas de changement
-        setIsRegistered(false); // Réinitialise la confirmation en cas de modification
+        setEnterpriseData(null);
+        setUserData(null);
+        setIsRegistered(false);
+        setOpenEnterpriseModal(false);
+        setOpenUserModal(false);
     };
 
-    // Fonction pour gérer la création d'une entreprise
-    const handleEntrepriseSubmit = async (data) => {
-        try {
-            const newEntreprise = await createEntreprise(data);
-            setEntrepriseData(newEntreprise); // Stocke l'entreprise créée pour l'utilisateur
-        } catch (error) {
-            console.error("Erreur lors de la création de l'entreprise :", error);
-        }
+    // Sauvegarder les données du formulaire Entreprise sans envoyer la requête
+    const handleEnterpriseSubmit = (data) => {
+        setEnterpriseData(data);
+        setOpenEnterpriseModal(false);
     };
 
-    // Fonction pour gérer la création d'un utilisateur
-    const handleUserSubmit = async (data) => {
+    // Sauvegarder les données du formulaire Utilisateur sans envoyer la requête
+    const handleUserSubmit = (data) => {
+        setUserData(data);
+        setOpenUserModal(false);
+    };
+
+    // Fonction de soumission finale de l'inscription
+    const handleFinalSubmit = async () => {
         try {
-            if (userType === "ENTREPRISE" && entrepriseData) {
-                data.entreprise = entrepriseData.id; // Associe l'utilisateur à l'entreprise créée
+            if (userType === "ENTREPRISE") {
+                // Créer l'entreprise d'abord et récupérer son ID
+                const newEnterprise = await createEntreprise(enterpriseData);
+                const finalUserData = { ...userData, entreprise: newEnterprise.id };
+                await createUser(finalUserData);
+            } else if (userType === "USER") {
+                await createUser(userData);
             }
-            await createUser(data);
-            setIsRegistered(true); // Active le message de confirmation
+            setIsRegistered(true);
         } catch (error) {
-            console.error("Erreur lors de la création de l'utilisateur :", error);
+            console.error("Erreur lors de l'inscription :", error);
         }
     };
 
     return (
-        <Container maxWidth="sm">
-            <Paper className={styles.registerContainer} elevation={3}>
-                <Typography variant="h4" className={styles.registerTitle} gutterBottom>Inscription</Typography>
-
-                {/* Message de confirmation après inscription */}
+        <Container maxWidth="sm" sx={{ mt: 8 }}>
+            <StyledPaper>
+                <GradientTitle variant="h4" gutterBottom>
+                    Inscription
+                </GradientTitle>
                 {isRegistered ? (
                     <>
-                        <Alert severity="success">L'entreprise et l'utilisateur ont été créés avec succès !</Alert>
-                        <Button
-                            onClick={() => navigate("/login")}
-                            variant="contained"
-                            color="primary"
-                            className={styles.loginRedirect}
-                        >
+                        <Alert severity="success" sx={{ mb: 2 }}>
+                            Inscription réussie !
+                        </Alert>
+                        <ModernButton onClick={() => navigate("/login")} fullWidth variant="contained">
                             Se Connecter
-                        </Button>
+                        </ModernButton>
                     </>
                 ) : (
                     <>
-                        {/* Sélecteur du type d'inscription */}
                         <RadioGroup value={userType} onChange={handleUserTypeChange} row>
                             <FormControlLabel value="USER" control={<Radio />} label="Utilisateur Simple" />
                             <FormControlLabel value="ENTREPRISE" control={<Radio />} label="Entreprise" />
                         </RadioGroup>
 
-                        {/* Si l'utilisateur choisit "Entreprise", on affiche d'abord le formulaire entreprise */}
-                        {userType === "ENTREPRISE" && !entrepriseData && (
-                            <EntrepriseForm onSubmit={handleEntrepriseSubmit} open={true} handleClose={() => {}} />
+                        {userType === "ENTREPRISE" && (
+                            <>
+                                <ModernButton onClick={() => setOpenEnterpriseModal(true)} fullWidth variant="contained">
+                                    Remplir le formulaire entreprise
+                                </ModernButton>
+                                {enterpriseData && (
+                                    <Typography variant="body1" sx={{ mt: 2 }}>
+                                        Entreprise saisie : {enterpriseData.name}
+                                    </Typography>
+                                )}
+                            </>
                         )}
 
-                        {/* Affichage du formulaire utilisateur uniquement quand :
-                            - L'utilisateur a choisi "Utilisateur Simple"
-                            - L'utilisateur a choisi "Entreprise" ET a déjà créé une entreprise */}
-                        {(userType === "USER" || (userType === "ENTREPRISE" && entrepriseData)) && (
-                            <UserForm
-                                onSubmit={handleUserSubmit}
-                                open={true}
-                                handleClose={() => {}}
-                                initialData={{ entreprise: entrepriseData ? entrepriseData.id : "" }} // Précoche l'entreprise si créée
-                            />
+                        {(userType === "USER" || userType === "ENTREPRISE") && (
+                            <ModernButton onClick={() => setOpenUserModal(true)} fullWidth variant="contained" sx={{ mt: 2 }}>
+                                Remplir le formulaire utilisateur
+                            </ModernButton>
+                        )}
+
+                        {((userType === "USER" && userData) ||
+                            (userType === "ENTREPRISE" && enterpriseData && userData)) && (
+                            <ModernButton onClick={handleFinalSubmit} fullWidth variant="contained" sx={{ mt: 2 }}>
+                                Valider l'inscription
+                            </ModernButton>
                         )}
                     </>
                 )}
-            </Paper>
+            </StyledPaper>
+
+            <EntrepriseForm
+                open={openEnterpriseModal}
+                onSubmit={handleEnterpriseSubmit}
+                handleClose={() => setOpenEnterpriseModal(false)}
+            />
+            <UserForm
+                open={openUserModal}
+                onSubmit={handleUserSubmit}
+                handleClose={() => setOpenUserModal(false)}
+                initialData={{ entreprise: enterpriseData ? enterpriseData.id : "" }}
+            />
         </Container>
     );
 };

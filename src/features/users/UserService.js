@@ -29,3 +29,9 @@ export const getUsersByCompany = async () => {
     const response = await api.get("/utilisateurs/getbycompany");
     return response.data;
 };
+
+
+export const getUsersByCompanyId = async (id) => {
+    const response = await api.get(`/utilisateurs/getbycompany/${id}`);
+    return response.data;
+}

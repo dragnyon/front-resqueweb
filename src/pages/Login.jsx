@@ -2,8 +2,66 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { Container, TextField, Button, Typography, Alert, Paper } from "@mui/material";
-import styles from "../styles/Login.module.css";
+import {
+    Container,
+    TextField,
+    Typography,
+    Alert,
+    Paper,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(4),
+    borderRadius: theme.spacing(2),
+    textAlign: "center",
+    backgroundColor: "#fff",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+}));
+
+const GradientTitle = styled(Typography)(({ theme }) => ({
+    background: "linear-gradient(90deg, #4b6cb7, #182848)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    fontWeight: 700,
+    marginBottom: theme.spacing(2),
+}));
+
+// Bouton personnalisé avec effet "shine" sur hover
+const ModernButton = styled("button")(({ theme }) => ({
+    border: "none",
+    outline: "none",
+    padding: theme.spacing(1.5),
+    width: "100%",
+    cursor: "pointer",
+    borderRadius: theme.spacing(1),
+    fontSize: "1rem",
+    fontWeight: 500,
+    color: "#fff",
+    background: "linear-gradient(45deg, #4b6cb7 30%, #182848 90%)",
+    boxShadow: "0 3px 5px 2px rgba(25, 118, 210, 0.3)",
+    position: "relative",
+    overflow: "hidden",
+    transition: "transform 0.3s, box-shadow 0.3s",
+    "&:hover": {
+        transform: "scale(1.05)",
+        boxShadow: "0 6px 10px rgba(0,0,0,0.3)",
+    },
+    "&::after": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        left: "-75%",
+        width: "50%",
+        height: "100%",
+        background: "rgba(255,255,255,0.2)",
+        transform: "skewX(-25deg)",
+        transition: "left 0.5s ease-in-out",
+    },
+    "&:hover::after": {
+        left: "125%",
+    },
+}));
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -16,22 +74,19 @@ const Login = () => {
         e.preventDefault();
         setError("");
         try {
-            // Appel à la fonction login du contexte
             await login(email, password);
-            // La redirection vers "/dashboard" est gérée dans AuthContext.login()
         } catch (err) {
-            // Affiche l'erreur retournée par la fonction login
             setError(err.message || "Email ou mot de passe incorrect !");
         }
     };
 
     return (
-        <Container maxWidth="xs">
-            <Paper className={styles.loginContainer} elevation={3}>
-                <Typography variant="h4" className={styles.loginTitle} gutterBottom>
+        <Container maxWidth="xs" sx={{ mt: 8 }}>
+            <StyledPaper>
+                <GradientTitle variant="h4" gutterBottom>
                     Connexion
-                </Typography>
-                {error && <Alert severity="error" className={styles.errorMessage}>{error}</Alert>}
+                </GradientTitle>
+                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
                 <form onSubmit={handleSubmit}>
                     <TextField
                         type="email"
@@ -51,19 +106,19 @@ const Login = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
-                    <Button type="submit" variant="contained" className={styles.loginButton}>
+                    <ModernButton type="submit" fullWidth variant="contained">
                         Se Connecter
-                    </Button>
+                    </ModernButton>
                 </form>
-            </Paper>
-            <Button
+            </StyledPaper>
+            <ModernButton
                 onClick={() => navigate("/register")}
+                fullWidth
                 variant="contained"
-                color="primary"
-                className={styles.registerRedirect}
+                sx={{ mt: 2 }}
             >
                 S'inscrire
-            </Button>
+            </ModernButton>
         </Container>
     );
 };

@@ -6,6 +6,11 @@ export const getAbonnements = async () => {
     return response.data;
 };
 
+export const getAbonnement = async (uuid) => {
+    const response = await api.get(`/abonnement/get/${uuid}`);
+    return response.data;
+};
+
 
 export const createAbonnement = async (abonnementData) => {
     const response = await api.post('/abonnement/create', abonnementData);
