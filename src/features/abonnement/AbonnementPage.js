@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { createAbonnement, deleteAbonnement, getAbonnements, updateAbonnement } from "./AbonnementService";
 import AbonnementList from "./AbonnementList";
-import AbonnementForm from "./AbonnmentForm";
+import AbonnementForm from "./AbonnementForm";
 import { Container, Typography, TextField, Grid } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
