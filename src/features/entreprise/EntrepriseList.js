@@ -23,7 +23,7 @@ import AbonnementForm from "../abonnement/AbonnementForm"; // Réutilisation de 
 
 const DataGridContainer = styled(Box)(({ theme }) => ({
     height: 500,
-    width: "90%",
+    width: "100%",
     margin: "auto",
     marginTop: theme.spacing(4),
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",

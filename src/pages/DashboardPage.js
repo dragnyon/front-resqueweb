@@ -8,6 +8,7 @@ import EntreprisesPage from "../features/entreprise/EntreprisePage";
 import AbonnementsPage from "../features/abonnement/AbonnementPage";
 import MyAbonnement from "../features/abonnement/myAbonnement";
 import { Container, Typography } from "@mui/material";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 const pageVariants = {
     initial: { opacity: 0, x: 50 },
@@ -18,7 +19,7 @@ const pageVariants = {
 const pageTransition = {
     type: "tween",
     ease: "anticipate",
-    duration: 0.2,
+    duration: 0.3,
 };
 
 const DashboardPage = () => {
@@ -46,63 +47,80 @@ const DashboardPage = () => {
                                 </motion.div>
                             }
                         />
-                        <Route
-                            path="users"
-                            element={
-                                <motion.div
-                                    initial="initial"
-                                    animate="in"
-                                    exit="out"
-                                    variants={pageVariants}
-                                    transition={pageTransition}
-                                >
-                                    <UsersPage />
-                                </motion.div>
-                            }
-                        />
-                        <Route
-                            path="entreprises"
-                            element={
-                                <motion.div
-                                    initial="initial"
-                                    animate="in"
-                                    exit="out"
-                                    variants={pageVariants}
-                                    transition={pageTransition}
-                                >
-                                    <EntreprisesPage />
-                                </motion.div>
-                            }
-                        />
-                        <Route
-                            path="abonnements"
-                            element={
-                                <motion.div
-                                    initial="initial"
-                                    animate="in"
-                                    exit="out"
-                                    variants={pageVariants}
-                                    transition={pageTransition}
-                                >
-                                    <AbonnementsPage />
-                                </motion.div>
-                            }
-                        />
-                        <Route
-                            path="myabonnement"
-                            element={
-                                <motion.div
-                                    initial="initial"
-                                    animate="in"
-                                    exit="out"
-                                    variants={pageVariants}
-                                    transition={pageTransition}
-                                >
-                                    <MyAbonnement />
-                                </motion.div>
-                            }
-                        />
+                        <Route  element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
+                            <Route
+                                path="users"
+                                element={
+                                    <motion.div
+                                        initial="initial"
+                                        animate="in"
+                                        exit="out"
+                                        variants={pageVariants}
+                                        transition={pageTransition}
+                                    >
+                                        <UsersPage />
+                                    </motion.div>
+                                }
+                            />
+                        </Route>
+
+
+                        <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
+                            <Route
+                                path="entreprises"
+                                element={
+                                    <motion.div
+                                        initial="initial"
+                                        animate="in"
+                                        exit="out"
+                                        variants={pageVariants}
+                                        transition={pageTransition}
+                                    >
+                                        <EntreprisesPage />
+                                    </motion.div>
+                                }
+                            />
+                        </Route>
+
+
+                        <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
+                            <Route
+                                path="abonnements"
+                                element={
+                                    <motion.div
+                                        initial="initial"
+                                        animate="in"
+                                        exit="out"
+                                        variants={pageVariants}
+                                        transition={pageTransition}
+                                    >
+                                        <AbonnementsPage />
+                                    </motion.div>
+                                }
+                            />
+                        </Route>
+
+
+                        <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN","ADMIN"]} />}>
+                            <Route
+                                path="myabonnement"
+                                element={
+                                    <motion.div
+                                        initial="initial"
+                                        animate="in"
+                                        exit="out"
+                                        variants={pageVariants}
+                                        transition={pageTransition}
+                                    >
+                                        <MyAbonnement />
+                                    </motion.div>
+                                }
+                            />
+                        </Route>
+
                     </Routes>
+
+
                 </AnimatePresence>
             </Container>
         </>

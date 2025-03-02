@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import {
     TextField,
-    Button,
     Typography,
     Modal,
     Box,
@@ -10,7 +9,8 @@ import {
     Autocomplete
 } from "@mui/material";
 import styles from "../../styles/Form.module.css";
-import { getAbonnements } from "../abonnement/AbonnementService"; // Assurez-vous que ce chemin est correct
+import { getAbonnements } from "../abonnement/AbonnementService";
+import CustomButton from "../../components/common/CustomButton"; // Assurez-vous que ce chemin est correct
 
 const modalStyle = {
     position: "absolute",
@@ -131,15 +131,9 @@ const EntrepriseForm = ({ onSubmit, initialData, open, handleClose }) => {
                         required
                     />
 
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        className={styles.submitButton}
-                    >
+                    <CustomButton type="submit" >
                         {initialData ? "Modifier" : "Ajouter"}
-                    </Button>
+                    </CustomButton>
                 </form>
             </Box>
         </Modal>

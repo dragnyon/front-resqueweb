@@ -10,6 +10,7 @@ import EntrepriseList from "./EntrepriseList";
 import EntrepriseForm from "./EntrepriseForm";
 import { Container, Typography, TextField } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import CustomButton from "../../components/common/CustomButton";
 
 const HeaderBox = styled("div")(({ theme }) => ({
     background: "linear-gradient(90deg, #4b6cb7 0%, #182848 100%)",
@@ -26,40 +27,6 @@ const ModernPaper = styled("div")(({ theme }) => ({
     borderRadius: theme.spacing(2),
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
     marginBottom: theme.spacing(4),
-}));
-
-const ModernButton = styled("button")(({ theme }) => ({
-    border: "none",
-    outline: "none",
-    padding: theme.spacing(1.5),
-    cursor: "pointer",
-    borderRadius: theme.spacing(1),
-    fontSize: "1rem",
-    fontWeight: 500,
-    color: "#fff",
-    background: "linear-gradient(45deg, #4b6cb7 30%, #182848 90%)",
-    boxShadow: "0 3px 5px 2px rgba(25,118,210,0.3)",
-    position: "relative",
-    overflow: "hidden",
-    transition: "transform 0.3s, box-shadow 0.3s",
-    "&:hover": {
-        transform: "scale(1.05)",
-        boxShadow: "0 6px 10px rgba(0,0,0,0.3)",
-    },
-    "&::after": {
-        content: '""',
-        position: "absolute",
-        top: 0,
-        left: "-75%",
-        width: "50%",
-        height: "100%",
-        background: "rgba(255,255,255,0.2)",
-        transform: "skewX(-25deg)",
-        transition: "left 0.5s ease-in-out",
-    },
-    "&:hover::after": {
-        left: "125%",
-    },
 }));
 
 const EntreprisesPage = () => {
@@ -124,14 +91,12 @@ const EntreprisesPage = () => {
     );
 
     return (
-        <Container sx={{ py: 4 }}>
+        <Container sx={{ py: 5 }}>
             <HeaderBox>
                 <Typography variant="h4" gutterBottom>
                     Gestion des Entreprises
                 </Typography>
-                <Typography variant="body1">
-                    Gérez vos entreprises de manière simple et efficace.
-                </Typography>
+
             </HeaderBox>
 
             <ModernPaper>
@@ -143,9 +108,9 @@ const EntreprisesPage = () => {
                     value={search}
                     onChange={handleSearch}
                 />
-                <ModernButton onClick={() => handleOpenEntrepriseForm()} style={{ marginTop: "16px" }}>
+                <CustomButton onClick={() => handleOpenEntrepriseForm()} style={{ marginTop: "16px" }}>
                     Ajouter une entreprise
-                </ModernButton>
+                </CustomButton>
             </ModernPaper>
 
             <EntrepriseList

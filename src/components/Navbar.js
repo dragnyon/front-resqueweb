@@ -75,8 +75,10 @@ const Navbar = () => {
     const navItems = [{ label: "Accueil", path: "/dashboard" }];
     if (userType === "ADMIN") {
         navItems.push(
-            { label: "Utilisateurs", path: "/dashboard/users" },
-            { label: "Mon abonnement", path: "/dashboard/myabonnement" }
+            { label: "Mes Collaborateurs", path: "/dashboard/myusers" },
+            { label: "Mon Entreprise", path: "/dashboard/mycompagny" },
+            { label: "Mon Profil", path: "/dashboard/myprofil" },
+            { label: "Mon Abonnement", path: "/dashboard/myabonnement" }
         );
     }
     if (userType === "SUPER_ADMIN") {

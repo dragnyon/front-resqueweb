@@ -3,10 +3,10 @@ import React, { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
-const ProtectedRoute = ({ allowedRoles }) => {
+const ProtectedRoute = ({ allowedRoles}) => {
     const { isAuthenticated, userInfo } = useContext(AuthContext);
     const userType = userInfo ? userInfo.typeUtilisateur : null;
-
+console.log(userType);
     // Si l'utilisateur n'est pas authentifié, redirige vers /login
     if (!isAuthenticated) {
         return <Navigate to="/login" />;

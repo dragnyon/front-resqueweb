@@ -8,6 +8,7 @@ import {
     MenuItem,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import CustomButton from "../../components/common/CustomButton";
 
 const StyledModalPaper = styled("div")(({ theme }) => ({
     position: "absolute",
@@ -21,40 +22,6 @@ const StyledModalPaper = styled("div")(({ theme }) => ({
     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 }));
 
-const ModernButton = styled("button")(({ theme }) => ({
-    border: "none",
-    outline: "none",
-    padding: theme.spacing(1.5),
-    width: "100%",
-    cursor: "pointer",
-    borderRadius: theme.spacing(1),
-    fontSize: "1rem",
-    fontWeight: 500,
-    color: "#fff",
-    background: "linear-gradient(45deg, #4b6cb7 30%, #182848 90%)",
-    boxShadow: "0 3px 5px 2px rgba(25,118,210,0.3)",
-    position: "relative",
-    overflow: "hidden",
-    transition: "transform 0.3s, box-shadow 0.3s",
-    "&:hover": {
-        transform: "scale(1.05)",
-        boxShadow: "0 6px 10px rgba(0,0,0,0.3)",
-    },
-    "&::after": {
-        content: '""',
-        position: "absolute",
-        top: 0,
-        left: "-75%",
-        width: "50%",
-        height: "100%",
-        background: "rgba(255,255,255,0.2)",
-        transform: "skewX(-25deg)",
-        transition: "left 0.5s ease-in-out",
-    },
-    "&:hover::after": {
-        left: "125%",
-    },
-}));
 
 const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
     const [dateDebut, setDateDebut] = useState("");
@@ -211,9 +178,9 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
                         value={computedEstActif}
                         InputProps={{ readOnly: true }}
                     />
-                    <ModernButton type="submit">
+                    <CustomButton type="submit">
                         {initialData ? "Modifier" : "Ajouter"}
-                    </ModernButton>
+                    </CustomButton>
                 </form>
             </StyledModalPaper>
         </Modal>
