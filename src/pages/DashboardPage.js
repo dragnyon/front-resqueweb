@@ -9,6 +9,7 @@ import AbonnementsPage from "./abonnement/AbonnementPage";
 import MyAbonnement from "./abonnement/myAbonnement";
 import { Container, Typography } from "@mui/material";
 import ProtectedRoute from "../components/ProtectedRoute";
+import DashboardTabs from "./DashboardTabs";
 
 const pageVariants = {
     initial: { opacity: 0, x: 50 },
@@ -31,6 +32,7 @@ const DashboardPage = () => {
             <Container>
                 <AnimatePresence mode="wait">
                     <Routes location={location} key={location.pathname}>
+
                         <Route
                             index
                             element={
@@ -47,6 +49,26 @@ const DashboardPage = () => {
                                 </motion.div>
                             }
                         />
+
+
+                        <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} /> }>
+                            <Route
+                                path="clients"
+                                element={
+                                    <motion.div
+                                        initial="initial"
+                                        animate="in"
+                                        exit="out"
+                                        variants={pageVariants}
+                                        transition={pageTransition}
+                                    >
+                                        <DashboardTabs />
+                                    </motion.div>
+                                }
+                            />
+                        </Route>
+
+
                         <Route  element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
                             <Route
                                 path="users"

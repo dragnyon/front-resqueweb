@@ -65,6 +65,7 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onSubmit({
+            id: initialData?.id,
             dateDebut: new Date(dateDebut).toISOString(),
             dateFin: new Date(dateFin).toISOString(),
             periodicite,

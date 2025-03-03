@@ -1,4 +1,3 @@
-// src/components/Navbar.js
 import React, { useContext, useState } from "react";
 import {
     AppBar,
@@ -13,8 +12,11 @@ import {
     Box,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { ThemeContext } from "../context/ThemeContext"; // ✅ Utilisation du bon ThemeContext
 import { styled } from "@mui/material/styles";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -28,7 +30,6 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     padding: theme.spacing(0, 2),
 }));
 
-// Bouton de navigation avec effet "ripple" moderne
 const NavButton = styled(Button)(({ theme }) => ({
     color: "#fff",
     margin: theme.spacing(0, 1),
@@ -37,12 +38,7 @@ const NavButton = styled(Button)(({ theme }) => ({
     position: "relative",
     overflow: "hidden",
     transition: "transform 0.3s",
-    // Assure que le texte reste au-dessus du pseudo-élément
-    "& > *": {
-        position: "relative",
-        zIndex: 1,
-    },
-    // Pseudo-élément pour l'animation ripple
+    "& > *": { position: "relative", zIndex: 1 },
     "&::before": {
         content: '""',
         position: "absolute",
@@ -69,9 +65,9 @@ const Navbar = () => {
     const navigate = useNavigate();
     const { logout, userInfo } = useContext(AuthContext);
     const userType = userInfo?.typeUtilisateur;
+    const { isDarkMode, toggleTheme } = useContext(ThemeContext); // ✅ Utilisation du bon ThemeContext
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    // Définition des liens en fonction du rôle
     const navItems = [{ label: "Accueil", path: "/dashboard" }];
     if (userType === "ADMIN") {
         navItems.push(
@@ -83,9 +79,8 @@ const Navbar = () => {
     }
     if (userType === "SUPER_ADMIN") {
         navItems.push(
-            { label: "Utilisateurs", path: "/dashboard/users" },
-            { label: "Abonnements", path: "/dashboard/abonnements" },
-            { label: "Entreprises", path: "/dashboard/entreprises" }
+            { label: "Gestion des données", path: "/dashboard/data" },
+            { label: "Gestion des clients", path: "/dashboard/clients" }
         );
     }
 
@@ -100,12 +95,7 @@ const Navbar = () => {
             </Typography>
             <List>
                 {navItems.map((item) => (
-                    <ListItem
-                        button
-                        key={item.label}
-                        onClick={() => navigate(item.path)}
-                        sx={{ justifyContent: "center" }}
-                    >
+                    <ListItem button key={item.label} onClick={() => navigate(item.path)} sx={{ justifyContent: "center" }}>
                         <ListItemText primary={item.label} sx={{ textAlign: "center" }} />
                     </ListItem>
                 ))}
@@ -127,7 +117,6 @@ const Navbar = () => {
                     >
                         ResqueWay
                     </Typography>
-                    {/* Version desktop */}
                     <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}>
                         {navItems.map((item) => (
                             <NavButton key={item.label} onClick={() => navigate(item.path)}>
@@ -135,8 +124,10 @@ const Navbar = () => {
                             </NavButton>
                         ))}
                         <NavButton onClick={logout}>Déconnexion</NavButton>
+                        <IconButton color="inherit" onClick={toggleTheme} sx={{ ml: 2 }}>
+                            {isDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
+                        </IconButton>
                     </Box>
-                    {/* Version mobile */}
                     <Box sx={{ display: { xs: "flex", sm: "none" } }}>
                         <IconButton color="inherit" onClick={toggleDrawer}>
                             <MenuIcon />

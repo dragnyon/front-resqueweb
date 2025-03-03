@@ -8,7 +8,7 @@ import {
 } from "../../services/EntrepriseService";
 import EntrepriseList from "./EntrepriseList";
 import EntrepriseForm from "./EntrepriseForm";
-import { Container, Typography, TextField } from "@mui/material";
+import {Container, Typography, TextField, Paper} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CustomButton from "../../components/common/CustomButton";
 
@@ -22,7 +22,7 @@ const HeaderBox = styled("div")(({ theme }) => ({
     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 }));
 
-const ModernPaper = styled("div")(({ theme }) => ({
+const ModernPaper = styled(Paper)(({ theme })  => ({
     padding: theme.spacing(3),
     borderRadius: theme.spacing(2),
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
@@ -100,13 +100,13 @@ const EntreprisesPage = () => {
             {/* 🔹 Gestion des erreurs et du chargement */}
             {isLoading && <Typography>Chargement des entreprises...</Typography>}
             {isError && <Typography color="error">Erreur lors du chargement</Typography>}
-
-            <EntrepriseList
-                entreprises={filteredEntreprises}
-                onDelete={handleDeleteEntreprise}
-                onEdit={handleOpenEntrepriseForm}
-            />
-
+            <ModernPaper>
+                <EntrepriseList
+                    entreprises={filteredEntreprises}
+                    onDelete={handleDeleteEntreprise}
+                    onEdit={handleOpenEntrepriseForm}
+                />
+            </ModernPaper>
             <EntrepriseForm
                 onSubmit={handleAddEntreprise}
                 initialData={editingEntreprise}

@@ -10,58 +10,28 @@ import {
     Paper,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import CustomButton from "../components/common/CustomButton";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(4),
     borderRadius: theme.spacing(2),
     textAlign: "center",
-    backgroundColor: "#fff",
+    backgroundColor: theme.palette.background.paper, // ✅ Respecte le mode sombre
+    color: theme.palette.text.primary, // ✅ Texte ajusté selon le mode sombre/clair
     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 }));
 
+
 const GradientTitle = styled(Typography)(({ theme }) => ({
-    background: "linear-gradient(90deg, #4b6cb7, #182848)",
+    background: theme.palette.mode === "dark"
+        ? "linear-gradient(90deg, #90caf9, #f48fb1)" // 🌙 Mode sombre : Bleu et Rose
+        : "linear-gradient(90deg, #4b6cb7, #182848)", // ☀️ Mode clair : Bleu foncé
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     fontWeight: 700,
     marginBottom: theme.spacing(2),
 }));
 
-// Bouton personnalisé avec effet "shine" sur hover
-const ModernButton = styled("button")(({ theme }) => ({
-    border: "none",
-    outline: "none",
-    padding: theme.spacing(1.5),
-    width: "100%",
-    cursor: "pointer",
-    borderRadius: theme.spacing(1),
-    fontSize: "1rem",
-    fontWeight: 500,
-    color: "#fff",
-    background: "linear-gradient(45deg, #4b6cb7 30%, #182848 90%)",
-    boxShadow: "0 3px 5px 2px rgba(25, 118, 210, 0.3)",
-    position: "relative",
-    overflow: "hidden",
-    transition: "transform 0.3s, box-shadow 0.3s",
-    "&:hover": {
-        transform: "scale(1.05)",
-        boxShadow: "0 6px 10px rgba(0,0,0,0.3)",
-    },
-    "&::after": {
-        content: '""',
-        position: "absolute",
-        top: 0,
-        left: "-75%",
-        width: "50%",
-        height: "100%",
-        background: "rgba(255,255,255,0.2)",
-        transform: "skewX(-25deg)",
-        transition: "left 0.5s ease-in-out",
-    },
-    "&:hover::after": {
-        left: "125%",
-    },
-}));
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -96,6 +66,15 @@ const Login = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        sx={{
+                            input: { color: "text.primary" }, // ✅ Texte qui respecte le mode sombre/clair
+                            label: { color: "text.secondary" }, // ✅ Label ajusté pour le mode sombre
+                            "& .MuiOutlinedInput-root": {
+                                "& fieldset": { borderColor: "text.secondary" }, // ✅ Bordure adaptée au thème
+                                "&:hover fieldset": { borderColor: "primary.main" },
+                                "&.Mui-focused fieldset": { borderColor: "primary.main" },
+                            },
+                        }}
                     />
                     <TextField
                         fullWidth
@@ -105,20 +84,29 @@ const Login = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        sx={{
+                            input: { color: "text.primary" }, // ✅ Texte qui respecte le mode sombre/clair
+                            label: { color: "text.secondary" }, // ✅ Label ajusté pour le mode sombre
+                            "& .MuiOutlinedInput-root": {
+                                "& fieldset": { borderColor: "text.secondary" }, // ✅ Bordure adaptée au thème
+                                "&:hover fieldset": { borderColor: "primary.main" },
+                                "&.Mui-focused fieldset": { borderColor: "primary.main" },
+                            },
+                        }}
                     />
-                    <ModernButton type="submit" fullWidth variant="contained">
+                    <CustomButton type="submit" fullWidth variant="contained">
                         Se Connecter
-                    </ModernButton>
+                    </CustomButton>
                 </form>
             </StyledPaper>
-            <ModernButton
+            <CustomButton
                 onClick={() => navigate("/register")}
                 fullWidth
                 variant="contained"
                 sx={{ mt: 2 }}
             >
                 S'inscrire
-            </ModernButton>
+            </CustomButton>
         </Container>
     );
 };

@@ -4,33 +4,26 @@ import { styled } from "@mui/material/styles";
 import { Button } from "@mui/material";
 
 const StyledButton = styled(Button)(({ theme }) => ({
-    padding: theme.spacing(1.5),
-    borderRadius: theme.spacing(1),
+    padding: theme.spacing(1.5, 3),
+    borderRadius: theme.shape.borderRadius * 2,
     fontSize: "1rem",
     fontWeight: 500,
     color: "#fff",
     background: "linear-gradient(45deg, #4b6cb7 30%, #182848 90%)",
-    boxShadow: "0 3px 5px 2px rgba(25,118,210,0.3)",
-    position: "relative",
-    overflow: "hidden",
-    transition: "transform 0.3s, box-shadow 0.3s",
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.2)",
+    textTransform: "none",
+    transition: "all 0.3s ease-out",
+
     "&:hover": {
-        transform: "scale(1.05)",
-        boxShadow: "0 6px 10px rgba(0,0,0,0.3)",
+        background: "linear-gradient(45deg, #5a7edc 30%, #1b2c50 90%)",
+        boxShadow: "0 6px 12px rgba(0, 0, 0, 0.3)",
+        transform: "translateY(-2px)",
     },
-    "&::after": {
-        content: '""',
-        position: "absolute",
-        top: 0,
-        left: "-75%",
-        width: "50%",
-        height: "100%",
-        background: "rgba(255,255,255,0.2)",
-        transform: "skewX(-25deg)",
-        transition: "left 0.5s ease-in-out",
-    },
-    "&:hover::after": {
-        left: "125%",
+
+    "&:active": {
+        background: "linear-gradient(45deg, #3d5fa3 30%, #121d34 90%)",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+        transform: "translateY(1px)",
     },
 }));
 

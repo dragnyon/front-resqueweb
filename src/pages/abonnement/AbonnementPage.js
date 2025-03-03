@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAbonnement, deleteAbonnement, getAbonnements, updateAbonnement } from "../../services/AbonnementService";
 import AbonnementList from "./AbonnementList";
 import AbonnementForm from "./AbonnementForm";
-import { Container, Typography, TextField, Grid } from "@mui/material";
+import {Container, Typography, TextField, Grid, Paper} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CustomButton from "../../components/common/CustomButton";
 
@@ -17,7 +17,7 @@ const HeaderBox = styled("div")(({ theme }) => ({
     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 }));
 
-const ModernPaper = styled("div")(({ theme }) => ({
+const ModernPaper = styled(Paper)(({ theme })  => ({
     padding: theme.spacing(3),
     borderRadius: theme.spacing(2),
     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",

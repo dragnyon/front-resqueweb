@@ -18,7 +18,7 @@ import InfoIcon from "@mui/icons-material/Info"; // Pour le bouton "voir l'abonn
 import { styled } from "@mui/material/styles";
 import {getUsersByCompanyId, deleteUser, updateUser} from "../../services/UserService"; // Vérifiez le chemin
 import UserForm from "../users/UserForm"; // Vérifiez le chemin
-import { getAbonnement } from "../../services/AbonnementService"; // Pour récupérer un abonnement
+import {getAbonnement, updateAbonnement} from "../../services/AbonnementService"; // Pour récupérer un abonnement
 import AbonnementForm from "../abonnement/AbonnementForm"; // Réutilisation de votre formulaire d'abonnement
 
 const DataGridContainer = styled(Box)(({ theme }) => ({
@@ -409,10 +409,16 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
             {openAbonnementForm && (
                 <AbonnementForm
                     onSubmit={(updatedAbo) => {
-                        // Ici, vous pouvez gérer la mise à jour de l'abonnement dans le back-end si nécessaire
+                        updateAbonnement(updatedAbo.id, updatedAbo)
+                            .then((updatedData) => {
+                                setEditingAbonnement(updatedData);
+                            })
+                            .catch((error) => console.error("Erreur lors de la mise à jour de l'abonnement :", error));
+
                         setOpenAbonnementForm(false);
                         setEditingAbonnement(null);
                     }}
+
                     initialData={editingAbonnement}
                     open={openAbonnementForm}
                     handleClose={() => {
