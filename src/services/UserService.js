@@ -1,4 +1,4 @@
-import api from "../../services/api";
+import api from "./api";
 
 // Récupérer tous les utilisateurs
 export const getUsers = async () => {

@@ -1,6 +1,6 @@
-// src/pages/AbonnementPage.js
-import React, { useEffect, useState } from "react";
-import { createAbonnement, deleteAbonnement, getAbonnements, updateAbonnement } from "./AbonnementService";
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { createAbonnement, deleteAbonnement, getAbonnements, updateAbonnement } from "../../services/AbonnementService";
 import AbonnementList from "./AbonnementList";
 import AbonnementForm from "./AbonnementForm";
 import { Container, Typography, TextField, Grid } from "@mui/material";
@@ -24,54 +24,38 @@ const ModernPaper = styled("div")(({ theme }) => ({
     marginBottom: theme.spacing(4),
 }));
 
-
-
 const AbonnementsPage = () => {
-    const [abonnements, setAbonnements] = useState([]);
     const [editingAbonnement, setEditingAbonnement] = useState(null);
     const [search, setSearch] = useState("");
     const [openAbonnementForm, setOpenAbonnementForm] = useState(false);
 
-    useEffect(() => {
-        const fetchAbonnements = async () => {
-            try {
-                const data = await getAbonnements();
-                setAbonnements(data);
-            } catch (error) {
-                console.error("Erreur lors du chargement des abonnements :", error);
-            }
-        };
-        fetchAbonnements();
-    }, []);
+    const queryClient = useQueryClient();
 
-    const handleAddAbonnement = async (abonnementData) => {
-        try {
-            if (editingAbonnement) {
-                const updatedAbonnement = await updateAbonnement(editingAbonnement.id, abonnementData);
-                setAbonnements((prev) =>
-                    prev.map((abonnement) =>
-                        abonnement.id === updatedAbonnement.id ? updatedAbonnement : abonnement
-                    )
-                );
-                setEditingAbonnement(null);
-            } else {
-                const newAbonnement = await createAbonnement(abonnementData);
-                setAbonnements((prev) => [...prev, newAbonnement]);
-            }
-        } catch (error) {
-            console.error("Erreur lors de la création ou modification de l'abonnement :", error);
-        }
-        setOpenAbonnementForm(false);
-    };
+    // 🔹 Récupération des abonnements via React Query
+    const { data: abonnements = [], isLoading, isError } = useQuery({
+        queryKey: ["abonnements"],
+        queryFn: getAbonnements,
+    });
 
-    const handleDeleteAbonnement = async (id) => {
-        try {
-            await deleteAbonnement(id);
-            setAbonnements((prev) => prev.filter((abonnement) => abonnement.id !== id));
-        } catch (error) {
-            console.error("Erreur lors de la suppression de l'abonnement :", error);
-        }
-    };
+    // 🔹 Mutation pour ajouter ou modifier un abonnement
+    const abonnementMutation = useMutation({
+        mutationFn: (abonnementData) =>
+            editingAbonnement ? updateAbonnement(editingAbonnement.id, abonnementData) : createAbonnement(abonnementData),
+        onSuccess: () => {
+            queryClient.invalidateQueries(["abonnements"]); // 🔹 Rafraîchir la liste après ajout/modif
+            setOpenAbonnementForm(false);
+            setEditingAbonnement(null);
+        },
+    });
+
+    // 🔹 Mutation pour supprimer un abonnement
+    const deleteMutation = useMutation({
+        mutationFn: deleteAbonnement,
+        onSuccess: () => queryClient.invalidateQueries(["abonnements"]), // 🔹 Rafraîchir la liste après suppression
+    });
+
+    const handleAddAbonnement = (abonnementData) => abonnementMutation.mutate(abonnementData);
+    const handleDeleteAbonnement = (id) => deleteMutation.mutate(id);
 
     const handleOpenAbonnementForm = (abonnement = null) => {
         setEditingAbonnement(abonnement);
@@ -92,7 +76,6 @@ const AbonnementsPage = () => {
                 <Typography variant="h4" gutterBottom>
                     Gestion des Abonnements
                 </Typography>
-
             </HeaderBox>
 
             <ModernPaper>
@@ -113,6 +96,10 @@ const AbonnementsPage = () => {
                     </Grid>
                 </Grid>
             </ModernPaper>
+
+            {/* 🔹 Gestion des erreurs et du chargement */}
+            {isLoading && <Typography>Chargement des abonnements...</Typography>}
+            {isError && <Typography color="error">Erreur lors du chargement</Typography>}
 
             <ModernPaper>
                 <AbonnementList

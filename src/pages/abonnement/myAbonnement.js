@@ -1,6 +1,6 @@
 import {useContext, useEffect, useState} from "react";
 import {AuthContext} from "../../context/AuthContext";
-import {getAbonnement, getAbonnements} from "./AbonnementService";
+import {getAbonnement, getAbonnements} from "../../services/AbonnementService";
 import JaugeAbonnement from "./JaugeAbonnement";
 
 

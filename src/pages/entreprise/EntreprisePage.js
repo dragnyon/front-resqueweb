@@ -1,11 +1,11 @@
-// src/pages/EntreprisePage.js
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     getEntreprises,
     createEntreprise,
     deleteEntreprise,
     updateEntreprise,
-} from "./EntrepriseService";
+} from "../../services/EntrepriseService";
 import EntrepriseList from "./EntrepriseList";
 import EntrepriseForm from "./EntrepriseForm";
 import { Container, Typography, TextField } from "@mui/material";
@@ -30,52 +30,37 @@ const ModernPaper = styled("div")(({ theme }) => ({
 }));
 
 const EntreprisesPage = () => {
-    const [entreprises, setEntreprises] = useState([]);
     const [editingEntreprise, setEditingEntreprise] = useState(null);
     const [search, setSearch] = useState("");
     const [openEntrepriseForm, setOpenEntrepriseForm] = useState(false);
 
-    useEffect(() => {
-        const fetchEntreprises = async () => {
-            try {
-                const data = await getEntreprises();
-                setEntreprises(data);
-                console.log("Entreprises chargées :", data);
-            } catch (error) {
-                console.error("Erreur lors du chargement des entreprises :", error);
-            }
-        };
-        fetchEntreprises();
-    }, []);
+    const queryClient = useQueryClient();
 
-    const handleAddEntreprise = async (entrepriseData) => {
-        try {
-            if (editingEntreprise) {
-                const updatedEntreprise = await updateEntreprise(editingEntreprise.id, entrepriseData);
-                setEntreprises((prev) =>
-                    prev.map((entreprise) =>
-                        entreprise.id === updatedEntreprise.id ? updatedEntreprise : entreprise
-                    )
-                );
-                setEditingEntreprise(null);
-            } else {
-                const newEntreprise = await createEntreprise(entrepriseData);
-                setEntreprises((prev) => [...prev, newEntreprise]);
-            }
-        } catch (error) {
-            console.error("Erreur lors de la création ou modification de l'entreprise :", error);
-        }
-        setOpenEntrepriseForm(false);
-    };
+    // 🔹 Récupération des entreprises via React Query
+    const { data: entreprises = [], isLoading, isError } = useQuery({
+        queryKey: ["entreprises"],
+        queryFn: getEntreprises,
+    });
 
-    const handleDeleteEntreprise = async (id) => {
-        try {
-            await deleteEntreprise(id);
-            setEntreprises((prev) => prev.filter((entreprise) => entreprise.id !== id));
-        } catch (error) {
-            console.error("Erreur lors de la suppression de l'entreprise :", error);
-        }
-    };
+    // 🔹 Mutation pour ajouter ou modifier une entreprise
+    const entrepriseMutation = useMutation({
+        mutationFn: (entrepriseData) =>
+            editingEntreprise ? updateEntreprise(editingEntreprise.id, entrepriseData) : createEntreprise(entrepriseData),
+        onSuccess: () => {
+            queryClient.invalidateQueries(["entreprises"]); // 🔹 Rafraîchir la liste après ajout/modif
+            setOpenEntrepriseForm(false);
+            setEditingEntreprise(null);
+        },
+    });
+
+    // 🔹 Mutation pour supprimer une entreprise
+    const deleteMutation = useMutation({
+        mutationFn: deleteEntreprise,
+        onSuccess: () => queryClient.invalidateQueries(["entreprises"]), // 🔹 Rafraîchir la liste après suppression
+    });
+
+    const handleAddEntreprise = (entrepriseData) => entrepriseMutation.mutate(entrepriseData);
+    const handleDeleteEntreprise = (id) => deleteMutation.mutate(id);
 
     const handleOpenEntrepriseForm = (entreprise = null) => {
         setEditingEntreprise(entreprise);
@@ -96,7 +81,6 @@ const EntreprisesPage = () => {
                 <Typography variant="h4" gutterBottom>
                     Gestion des Entreprises
                 </Typography>
-
             </HeaderBox>
 
             <ModernPaper>
@@ -112,6 +96,10 @@ const EntreprisesPage = () => {
                     Ajouter une entreprise
                 </CustomButton>
             </ModernPaper>
+
+            {/* 🔹 Gestion des erreurs et du chargement */}
+            {isLoading && <Typography>Chargement des entreprises...</Typography>}
+            {isError && <Typography color="error">Erreur lors du chargement</Typography>}
 
             <EntrepriseList
                 entreprises={filteredEntreprises}

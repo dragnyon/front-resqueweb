@@ -12,10 +12,10 @@ import {
     Alert,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import UserForm from "../features/users/UserForm";
-import EntrepriseForm from "../features/entreprise/EntrepriseForm";
-import { createEntreprise } from "../features/entreprise/EntrepriseService";
-import { createUser } from "../features/users/UserService";
+import UserForm from "./users/UserForm";
+import EntrepriseForm from "./entreprise/EntrepriseForm";
+import { createEntreprise } from "../services/EntrepriseService";
+import { createUser } from "../services/UserService";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(4),

@@ -1,6 +1,6 @@
-// src/pages/UsersPage.js
-import React, { useContext, useEffect, useState } from "react";
-import { getUsers, createUser, deleteUser, updateUser, getUsersByCompany } from "./UserService";
+import React, { useContext, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getUsers, createUser, deleteUser, updateUser, getUsersByCompany } from "../../services/UserService";
 import UserList from "./UserList";
 import UserForm from "./UserForm";
 import { Container, Typography, TextField, Paper, Grid, Box } from "@mui/material";
@@ -28,7 +28,6 @@ const ModernPaper = styled(Paper)(({ theme }) => ({
 }));
 
 const UsersPage = () => {
-    const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
     const [search, setSearch] = useState("");
     const [openUserForm, setOpenUserForm] = useState(false);
@@ -36,49 +35,33 @@ const UsersPage = () => {
     const { userInfo } = useContext(AuthContext);
     const userType = userInfo?.typeUtilisateur;
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                let data;
-                if (userType === "ADMIN") {
-                    data = await getUsersByCompany();
-                } else {
-                    data = await getUsers();
-                }
-                setUsers(data);
-            } catch (error) {
-                console.error("Erreur lors du chargement des utilisateurs :", error);
-            }
-        };
-        fetchUsers();
-    }, [userType]);
+    const queryClient = useQueryClient();
 
-    const handleAddUser = async (userData) => {
-        try {
-            if (editingUser) {
-                const updatedUser = await updateUser(editingUser.id, userData);
-                setUsers((prevUsers) =>
-                    prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
-                );
-                setEditingUser(null);
-            } else {
-                const newUser = await createUser(userData);
-                setUsers((prevUsers) => [...prevUsers, newUser]);
-            }
-        } catch (error) {
-            console.error("Erreur lors de la création ou modification de l'utilisateur :", error);
-        }
-        setOpenUserForm(false);
-    };
+    // 🔹 Récupération des utilisateurs via React Query
+    const { data: users = [], isLoading, isError } = useQuery({
+        queryKey: ["users", userType], // 🔹 Ajoute userType pour différencier les requêtes ADMIN/SUPER_ADMIN
+        queryFn: () => (userType === "ADMIN" ? getUsersByCompany() : getUsers()),
+    });
 
-    const handleDeleteUser = async (id) => {
-        try {
-            await deleteUser(id);
-            setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
-        } catch (error) {
-            console.error("Erreur lors de la suppression de l'utilisateur :", error);
-        }
-    };
+    // 🔹 Mutation pour ajouter ou modifier un utilisateur
+    const userMutation = useMutation({
+        mutationFn: (userData) =>
+            editingUser ? updateUser(editingUser.id, userData) : createUser(userData),
+        onSuccess: () => {
+            queryClient.invalidateQueries(["users", userType]); // 🔹 Rafraîchir la liste après ajout/modif
+            setOpenUserForm(false);
+            setEditingUser(null);
+        },
+    });
+
+    // 🔹 Mutation pour supprimer un utilisateur
+    const deleteMutation = useMutation({
+        mutationFn: deleteUser,
+        onSuccess: () => queryClient.invalidateQueries(["users", userType]), // 🔹 Rafraîchir la liste après suppression
+    });
+
+    const handleAddUser = (userData) => userMutation.mutate(userData);
+    const handleDeleteUser = (id) => deleteMutation.mutate(id);
 
     const handleOpenUserForm = (user = null) => {
         setEditingUser(user);
@@ -100,7 +83,6 @@ const UsersPage = () => {
                 <Typography variant="h4" gutterBottom>
                     Gestion des Utilisateurs
                 </Typography>
-
             </HeaderBox>
 
             {/* Barre de recherche et bouton d'ajout */}
@@ -122,6 +104,10 @@ const UsersPage = () => {
                     </Grid>
                 </Grid>
             </ModernPaper>
+
+            {/* 🔹 Gestion des erreurs et du chargement */}
+            {isLoading ? <Typography>Chargement des utilisateurs...</Typography> : null}
+            {isError ? <Typography color="error">Erreur lors du chargement</Typography> : null}
 
             {/* Liste des utilisateurs */}
             <ModernPaper>

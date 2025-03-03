@@ -3,10 +3,10 @@ import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "../components/Navbar";
-import UsersPage from "../features/users/UsersPage";
-import EntreprisesPage from "../features/entreprise/EntreprisePage";
-import AbonnementsPage from "../features/abonnement/AbonnementPage";
-import MyAbonnement from "../features/abonnement/myAbonnement";
+import UsersPage from "./users/UsersPage";
+import EntreprisesPage from "./entreprise/EntreprisePage";
+import AbonnementsPage from "./abonnement/AbonnementPage";
+import MyAbonnement from "./abonnement/myAbonnement";
 import { Container, Typography } from "@mui/material";
 import ProtectedRoute from "../components/ProtectedRoute";
 

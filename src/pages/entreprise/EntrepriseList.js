@@ -16,9 +16,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import GroupIcon from "@mui/icons-material/Group";
 import InfoIcon from "@mui/icons-material/Info"; // Pour le bouton "voir l'abonnement"
 import { styled } from "@mui/material/styles";
-import {getUsersByCompanyId, deleteUser, updateUser} from "../users/UserService"; // Vérifiez le chemin
+import {getUsersByCompanyId, deleteUser, updateUser} from "../../services/UserService"; // Vérifiez le chemin
 import UserForm from "../users/UserForm"; // Vérifiez le chemin
-import { getAbonnement } from "../abonnement/AbonnementService"; // Pour récupérer un abonnement
+import { getAbonnement } from "../../services/AbonnementService"; // Pour récupérer un abonnement
 import AbonnementForm from "../abonnement/AbonnementForm"; // Réutilisation de votre formulaire d'abonnement
 
 const DataGridContainer = styled(Box)(({ theme }) => ({

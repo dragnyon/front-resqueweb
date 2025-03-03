@@ -1,4 +1,4 @@
-import api from '../../services/api';
+import api from './api';
 
 // Récupérer toutes les entreprises
 export const getEntreprises = async () => {
