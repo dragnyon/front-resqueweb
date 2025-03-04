@@ -1,6 +1,5 @@
-// src/pages/UserList.js
 import React, { useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbarContainer } from "@mui/x-data-grid";
 import {
     IconButton,
     Dialog,
@@ -13,6 +12,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
 
 const DataGridContainer = styled(Box)(({ theme }) => ({
@@ -76,7 +76,7 @@ const localeText = {
     footerPaginationRowsPerPage: "Lignes par page :",
 };
 
-const UserList = ({ users, onDelete, onEdit }) => {
+const UserList = ({ users, onDelete, onEdit, onAdd }) => {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
 
@@ -97,7 +97,7 @@ const UserList = ({ users, onDelete, onEdit }) => {
         }
     };
 
-    // Filtrer pour ne garder que les utilisateurs ayant un id
+    // Conserver uniquement les utilisateurs avec un id défini
     const rows = (users || []).filter((user) => user && user.id);
 
     const columns = [
@@ -140,6 +140,27 @@ const UserList = ({ users, onDelete, onEdit }) => {
         },
     ];
 
+    // Toolbar intégrée dans la DataGrid pour une meilleure intégration visuelle
+    const CustomToolbar = () => (
+        <GridToolbarContainer
+            sx={{
+                backgroundColor: "rgba(0, 0, 0, 0.04)",
+                padding: "8px",
+                borderBottom: "1px solid #ccc",
+            }}
+        >
+            <Box sx={{ flexGrow: 1 }} />
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={onAdd}
+                startIcon={<AddIcon />}
+            >
+                Ajouter un utilisateur
+            </Button>
+        </GridToolbarContainer>
+    );
+
     return (
         <>
             <DataGridContainer>
@@ -150,6 +171,7 @@ const UserList = ({ users, onDelete, onEdit }) => {
                     rowsPerPageOptions={[5, 10, 20]}
                     disableSelectionOnClick
                     localeText={localeText}
+                    slots={{ toolbar: CustomToolbar }}
                     sx={{
                         border: "none",
                         "& .MuiDataGrid-cell:hover": {
@@ -165,7 +187,9 @@ const UserList = ({ users, onDelete, onEdit }) => {
                 aria-labelledby="confirm-dialog-title"
                 aria-describedby="confirm-dialog-description"
             >
-                <DialogTitle id="confirm-dialog-title">Confirmation de suppression</DialogTitle>
+                <DialogTitle id="confirm-dialog-title">
+                    Confirmation de suppression
+                </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="confirm-dialog-description">
                         Êtes-vous sûr de vouloir supprimer l'utilisateur{" "}

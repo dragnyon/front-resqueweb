@@ -3,10 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUsers, createUser, deleteUser, updateUser, getUsersByCompany } from "../../services/UserService";
 import UserList from "./UserList";
 import UserForm from "./UserForm";
-import { Container, Typography, TextField, Paper, Grid, Box } from "@mui/material";
+import { Container, Typography, Paper, Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { AuthContext } from "../../context/AuthContext";
-import CustomButton from "../../components/common/CustomButton";
 
 // Zone d'en-tête avec dégradé
 const HeaderBox = styled(Box)(({ theme }) => ({
@@ -29,7 +28,6 @@ const ModernPaper = styled(Paper)(({ theme }) => ({
 
 const UsersPage = () => {
     const [editingUser, setEditingUser] = useState(null);
-    const [search, setSearch] = useState("");
     const [openUserForm, setOpenUserForm] = useState(false);
 
     const { userInfo } = useContext(AuthContext);
@@ -68,14 +66,6 @@ const UsersPage = () => {
         setOpenUserForm(true);
     };
 
-    const handleSearch = (event) => {
-        setSearch(event.target.value);
-    };
-
-    const filteredUsers = users.filter((user) =>
-        user.email.toLowerCase().includes(search.toLowerCase())
-    );
-
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
             {/* En-tête de page */}
@@ -85,33 +75,20 @@ const UsersPage = () => {
                 </Typography>
             </HeaderBox>
 
-            {/* Barre de recherche et bouton d'ajout */}
-            <ModernPaper>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} md={8}>
-                        <TextField
-                            label="Rechercher par email"
-                            variant="outlined"
-                            fullWidth
-                            value={search}
-                            onChange={handleSearch}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={4} sx={{ textAlign: { xs: "center", md: "right" } }}>
-                        <CustomButton onClick={() => handleOpenUserForm()}>
-                            Ajouter un utilisateur
-                        </CustomButton>
-                    </Grid>
-                </Grid>
-            </ModernPaper>
-
             {/* 🔹 Gestion des erreurs et du chargement */}
             {isLoading ? <Typography>Chargement des utilisateurs...</Typography> : null}
             {isError ? <Typography color="error">Erreur lors du chargement</Typography> : null}
 
             {/* Liste des utilisateurs */}
             <ModernPaper>
-                <UserList users={filteredUsers} onDelete={handleDeleteUser} onEdit={handleOpenUserForm} />
+                <UserList
+                    users={users}
+                    onDelete={handleDeleteUser}
+                    onEdit={handleOpenUserForm}
+                    onAdd={() => {
+                        handleOpenUserForm();
+                    }}
+                />
             </ModernPaper>
 
             {/* Formulaire d'ajout/modification */}

@@ -80,7 +80,6 @@ const AbonnementsPage = () => {
                     onDelete={handleDeleteAbonnement}
                     onEdit={handleOpenAbonnementForm}
                     onAdd={() => {
-                        console.log("onAdd callback appelé");
                         handleOpenAbonnementForm();
                     }}
                 />
