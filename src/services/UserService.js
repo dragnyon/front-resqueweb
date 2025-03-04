@@ -6,6 +6,12 @@ export const getUsers = async () => {
     return response.data;
 };
 
+// Récupérer un utilisateur
+export const getUser = async (uuid) => {
+    const response = await api.get(`/utilisateurs/get/${uuid}`);
+    return response.data;
+};
+
 // Ajouter un utilisateur
 export const createUser = async (userData) => {
     const response = await api.post("/utilisateurs/create", userData);

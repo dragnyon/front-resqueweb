@@ -4,7 +4,15 @@ import CustomModal from "../../components/common/CustomModal";
 import CustomButton from "../../components/common/CustomButton";
 import { getEntreprises } from "../../services/EntrepriseService";
 
-const UserForm = ({ onSubmit, initialData, defaultEntreprise, open, handleClose }) => {
+const UserForm = ({
+                      onSubmit,
+                      initialData,
+                      defaultEntreprise,
+                      open,
+                      handleClose,
+                      disableEntreprise = false,
+                      disableTypeUtilisateur = false,
+                  }) => {
     const [formValues, setFormValues] = useState({
         email: "",
         nom: "",
@@ -16,7 +24,6 @@ const UserForm = ({ onSubmit, initialData, defaultEntreprise, open, handleClose 
 
     const [entreprises, setEntreprises] = useState([]);
 
-    // Charger les entreprises au montage
     useEffect(() => {
         const fetchEntreprises = async () => {
             try {
@@ -29,7 +36,6 @@ const UserForm = ({ onSubmit, initialData, defaultEntreprise, open, handleClose 
         fetchEntreprises();
     }, []);
 
-    // Charger les données de l'utilisateur en modification ou pré-remplir pour un ajout
     useEffect(() => {
         if (open) {
             if (initialData) {
@@ -37,14 +43,16 @@ const UserForm = ({ onSubmit, initialData, defaultEntreprise, open, handleClose 
                     email: initialData.email || "",
                     nom: initialData.nom || "",
                     prenom: initialData.prenom || "",
-                    password: "", // Pas de mot de passe par défaut en mode édition
-                    typeUtilisateur: initialData.typeUtilisateur || "USER",
+                    password: "",
+                    // Utilisation directe de la valeur initiale sans fallback par "USER"
+                    typeUtilisateur: initialData.typeUtilisateur,
                     entreprise: initialData.entreprise
-                        ? entreprises.find((e) => e.id.toString() === initialData.entreprise.toString()) || null
+                        ? entreprises.find(
+                        (e) => e.id.toString() === initialData.entreprise.toString()
+                    ) || null
                         : null,
                 });
             } else {
-                // Mode ajout : utiliser defaultEntreprise si fournie
                 setFormValues({
                     email: "",
                     nom: "",
@@ -63,15 +71,17 @@ const UserForm = ({ onSubmit, initialData, defaultEntreprise, open, handleClose 
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit({
+        // Si disableTypeUtilisateur est true, forçons la valeur avec celle d'initialData
+        const submittedData = {
             id: initialData?.id,
             email: formValues.email,
             nom: formValues.nom,
             prenom: formValues.prenom,
             password: formValues.password || undefined,
             entreprise: formValues.entreprise ? formValues.entreprise.id : null,
-            typeUtilisateur: formValues.typeUtilisateur,
-        });
+            typeUtilisateur: disableTypeUtilisateur ? initialData.typeUtilisateur : formValues.typeUtilisateur,
+        };
+        onSubmit(submittedData);
         handleClose();
     };
 
@@ -127,6 +137,7 @@ const UserForm = ({ onSubmit, initialData, defaultEntreprise, open, handleClose 
                     </Grid>
                     <Grid item xs={12}>
                         <Autocomplete
+                            disabled={disableEntreprise}
                             options={entreprises}
                             getOptionLabel={(option) => option.name || ""}
                             value={formValues.entreprise}
@@ -139,16 +150,26 @@ const UserForm = ({ onSubmit, initialData, defaultEntreprise, open, handleClose 
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <Select
-                            fullWidth
-                            name="typeUtilisateur"
-                            value={formValues.typeUtilisateur}
-                            onChange={handleChange}
-                        >
-                            <MenuItem value="SUPER_ADMIN">SUPER_ADMIN</MenuItem>
-                            <MenuItem value="ADMIN">ADMIN</MenuItem>
-                            <MenuItem value="USER">USER</MenuItem>
-                        </Select>
+                        {disableTypeUtilisateur ? (
+                            <TextField
+                                fullWidth
+                                label="Type d'utilisateur"
+                                name="typeUtilisateur"
+                                value={formValues.typeUtilisateur}
+                                disabled
+                            />
+                        ) : (
+                            <Select
+                                fullWidth
+                                name="typeUtilisateur"
+                                value={formValues.typeUtilisateur}
+                                onChange={handleChange}
+                            >
+                                <MenuItem value="SUPER_ADMIN">SUPER_ADMIN</MenuItem>
+                                <MenuItem value="ADMIN">ADMIN</MenuItem>
+                                <MenuItem value="USER">USER</MenuItem>
+                            </Select>
+                        )}
                     </Grid>
                     <Grid item xs={12}>
                         <CustomButton type="submit" fullWidth>

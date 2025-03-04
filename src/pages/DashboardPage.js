@@ -11,6 +11,7 @@ import { Container, Typography } from "@mui/material";
 import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardTabs from "./DashboardTabs";
 import MyCompagnyPage from "./entreprise/MyCompagnyPage";
+import MyProfilePage from "./users/MyProfilePage";
 
 const pageVariants = {
     initial: { opacity: 0, x: 50 },
@@ -156,10 +157,24 @@ const DashboardPage = () => {
                                     </motion.div>
                                 }
                             />
-
                         </Route>
 
-
+                        <Route element={ <ProtectedRoute allowedRoles={["ADMIN"]} /> }>
+                            <Route
+                                path="myprofil"
+                                element={
+                                    <motion.div
+                                        initial="initial"
+                                        animate="in"
+                                        exit="out"
+                                        variants={pageVariants}
+                                        transition={pageTransition}
+                                    >
+                                        <MyProfilePage />
+                                    </motion.div>
+                                }
+                            />
+                        </Route>
 
                     </Routes>
 
