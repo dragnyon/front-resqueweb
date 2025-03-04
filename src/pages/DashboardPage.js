@@ -12,6 +12,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardTabs from "./DashboardTabs";
 import MyCompagnyPage from "./entreprise/MyCompagnyPage";
 import MyProfilePage from "./users/MyProfilePage";
+import MyUsersPage from "./users/MyUsersPage";
 
 const pageVariants = {
     initial: { opacity: 0, x: 50 },
@@ -171,6 +172,23 @@ const DashboardPage = () => {
                                         transition={pageTransition}
                                     >
                                         <MyProfilePage />
+                                    </motion.div>
+                                }
+                            />
+                        </Route>
+
+                        <Route element={ <ProtectedRoute allowedRoles={["ADMIN"]} /> }>
+                            <Route
+                                path="myusers"
+                                element={
+                                    <motion.div
+                                        initial="initial"
+                                        animate="in"
+                                        exit="out"
+                                        variants={pageVariants}
+                                        transition={pageTransition}
+                                    >
+                                        <MyUsersPage />
                                     </motion.div>
                                 }
                             />
