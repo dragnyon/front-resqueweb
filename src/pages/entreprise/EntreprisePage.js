@@ -8,9 +8,9 @@ import {
 } from "../../services/EntrepriseService";
 import EntrepriseList from "./EntrepriseList";
 import EntrepriseForm from "./EntrepriseForm";
-import {Container, Typography, TextField, Paper} from "@mui/material";
+import {Container, Typography, Paper} from "@mui/material";
 import { styled } from "@mui/material/styles";
-import CustomButton from "../../components/common/CustomButton";
+
 
 const HeaderBox = styled("div")(({ theme }) => ({
     background: "linear-gradient(90deg, #4b6cb7 0%, #182848 100%)",
@@ -31,7 +31,6 @@ const ModernPaper = styled(Paper)(({ theme })  => ({
 
 const EntreprisesPage = () => {
     const [editingEntreprise, setEditingEntreprise] = useState(null);
-    const [search, setSearch] = useState("");
     const [openEntrepriseForm, setOpenEntrepriseForm] = useState(false);
 
     const queryClient = useQueryClient();
@@ -67,14 +66,6 @@ const EntreprisesPage = () => {
         setOpenEntrepriseForm(true);
     };
 
-    const handleSearch = (event) => {
-        setSearch(event.target.value);
-    };
-
-    const filteredEntreprises = entreprises.filter((entreprise) =>
-        entreprise.mail.toLowerCase().includes(search.toLowerCase())
-    );
-
     return (
         <Container sx={{ py: 5 }}>
             <HeaderBox>
@@ -83,28 +74,15 @@ const EntreprisesPage = () => {
                 </Typography>
             </HeaderBox>
 
-            <ModernPaper>
-                <TextField
-                    label="Rechercher une entreprise par email"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={search}
-                    onChange={handleSearch}
-                />
-                <CustomButton onClick={() => handleOpenEntrepriseForm()} style={{ marginTop: "16px" }}>
-                    Ajouter une entreprise
-                </CustomButton>
-            </ModernPaper>
-
             {/* 🔹 Gestion des erreurs et du chargement */}
             {isLoading && <Typography>Chargement des entreprises...</Typography>}
             {isError && <Typography color="error">Erreur lors du chargement</Typography>}
             <ModernPaper>
                 <EntrepriseList
-                    entreprises={filteredEntreprises}
+                    entreprises={entreprises}
                     onDelete={handleDeleteEntreprise}
                     onEdit={handleOpenEntrepriseForm}
+                    onAdd={ () => handleOpenEntrepriseForm() }
                 />
             </ModernPaper>
             <EntrepriseForm

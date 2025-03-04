@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbarContainer } from "@mui/x-data-grid";
 import {
     IconButton,
     Dialog,
@@ -14,12 +14,13 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import GroupIcon from "@mui/icons-material/Group";
-import InfoIcon from "@mui/icons-material/Info"; // Pour le bouton "voir l'abonnement"
+import InfoIcon from "@mui/icons-material/Info";
+import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
-import {getUsersByCompanyId, deleteUser, updateUser} from "../../services/UserService"; // Vérifiez le chemin
-import UserForm from "../users/UserForm"; // Vérifiez le chemin
-import {getAbonnement, updateAbonnement} from "../../services/AbonnementService"; // Pour récupérer un abonnement
-import AbonnementForm from "../abonnement/AbonnementForm"; // Réutilisation de votre formulaire d'abonnement
+import { getUsersByCompanyId, deleteUser, updateUser } from "../../services/UserService";
+import UserForm from "../users/UserForm";
+import { getAbonnement, updateAbonnement } from "../../services/AbonnementService";
+import AbonnementForm from "../abonnement/AbonnementForm";
 
 const DataGridContainer = styled(Box)(({ theme }) => ({
     height: 500,
@@ -82,7 +83,7 @@ const localeText = {
     footerPaginationRowsPerPage: "Lignes par page :",
 };
 
-const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
+const EntrepriseList = ({ entreprises, onDelete, onEdit, onAdd }) => {
     // États pour la suppression d'entreprise
     const [openConfirm, setOpenConfirm] = useState(false);
     const [entrepriseToDelete, setEntrepriseToDelete] = useState(null);
@@ -98,11 +99,11 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
     const [userToDelete, setUserToDelete] = useState(null);
     const [openUserDeleteConfirm, setOpenUserDeleteConfirm] = useState(false);
 
-    // Nouveaux états pour le formulaire d'abonnement
+    // États pour le formulaire d'abonnement
     const [openAbonnementForm, setOpenAbonnementForm] = useState(false);
     const [editingAbonnement, setEditingAbonnement] = useState(null);
 
-    // Nouvel état pour afficher le message quand l'entreprise n'a pas d'abonnement
+    // État pour afficher le message quand l'entreprise n'a pas d'abonnement
     const [openNoAbonnementDialog, setOpenNoAbonnementDialog] = useState(false);
 
     // Gestion de la suppression d'entreprise
@@ -130,10 +131,7 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
             const users = await getUsersByCompanyId(entreprise.id);
             setEnterpriseUsers(users);
         } catch (error) {
-            console.error(
-                "Erreur lors du chargement des utilisateurs de l'entreprise :",
-                error
-            );
+            console.error("Erreur lors du chargement des utilisateurs de l'entreprise :", error);
         }
         setOpenUsersModal(true);
     };
@@ -149,7 +147,6 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                 console.error("Erreur lors de la récupération de l'abonnement :", error);
             }
         } else {
-            // Affiche le message si aucune abonnement n'est associé
             setOpenNoAbonnementDialog(true);
         }
     };
@@ -216,29 +213,16 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                 if (!params?.row) return null;
                 return (
                     <>
-                        {/* Bouton pour consulter/modifier l'abonnement */}
-                        <IconButton
-                            color="info"
-                            onClick={() => handleViewAbonnement(params.row)}
-                        >
+                        <IconButton color="info" onClick={() => handleViewAbonnement(params.row)}>
                             <InfoIcon />
                         </IconButton>
-                        {/* Bouton pour éditer l'entreprise */}
                         <IconButton color="primary" onClick={() => onEdit(params.row)}>
                             <EditIcon />
                         </IconButton>
-                        {/* Bouton pour gérer les utilisateurs */}
-                        <IconButton
-                            color="secondary"
-                            onClick={() => handleManageUsers(params.row)}
-                        >
+                        <IconButton color="secondary" onClick={() => handleManageUsers(params.row)}>
                             <GroupIcon />
                         </IconButton>
-                        {/* Bouton pour supprimer l'entreprise */}
-                        <IconButton
-                            color="error"
-                            onClick={() => handleOpenConfirm(params.row)}
-                        >
+                        <IconButton color="error" onClick={() => handleOpenConfirm(params.row)}>
                             <DeleteIcon />
                         </IconButton>
                     </>
@@ -247,9 +231,30 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
         },
     ];
 
+    // Toolbar intégrée pour une meilleure intégration visuelle dans la DataGrid
+    const CustomToolbar = () => (
+        <GridToolbarContainer
+            sx={{
+                backgroundColor: "rgba(0, 0, 0, 0.04)",
+                padding: "8px",
+                borderBottom: "1px solid #ccc",
+            }}
+        >
+            <Box sx={{ flexGrow: 1 }} />
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={onAdd}
+                startIcon={<AddIcon />}
+            >
+                Ajouter une entreprise
+            </Button>
+        </GridToolbarContainer>
+    );
+
     return (
         <>
-            {/* DataGrid des entreprises */}
+            {/* DataGrid des entreprises avec Toolbar intégrée */}
             <DataGridContainer>
                 <DataGrid
                     rows={rows}
@@ -258,6 +263,7 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                     rowsPerPageOptions={[5, 10, 20]}
                     disableSelectionOnClick
                     localeText={localeText}
+                    slots={{ toolbar: CustomToolbar }}
                     sx={{
                         border: "none",
                         "& .MuiDataGrid-cell:hover": { color: "primary.main" },
@@ -277,8 +283,7 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="confirm-dialog-description">
-                        Êtes-vous sûr de vouloir supprimer l'entreprise{" "}
-                        <strong>{entrepriseToDelete?.name}</strong> ?
+                        Êtes-vous sûr de vouloir supprimer l'entreprise <strong>{entrepriseToDelete?.name}</strong> ?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -291,16 +296,14 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                 </DialogActions>
             </Dialog>
 
-            {/* Modale pour la gestion des utilisateurs */}
+            {/* Modale pour la gestion des utilisateurs de l'entreprise */}
             <Dialog
                 open={openUsersModal}
                 onClose={() => setOpenUsersModal(false)}
                 fullWidth
                 maxWidth="md"
             >
-                <DialogTitle>
-                    Utilisateurs de {selectedEnterprise?.name}
-                </DialogTitle>
+                <DialogTitle>Utilisateurs de {selectedEnterprise?.name}</DialogTitle>
                 <DialogContent>
                     {enterpriseUsers.length > 0 ? (
                         <DataGrid
@@ -318,16 +321,10 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                                     filterable: false,
                                     renderCell: (params) => (
                                         <>
-                                            <IconButton
-                                                color="primary"
-                                                onClick={() => handleEditUser(params.row)}
-                                            >
+                                            <IconButton color="primary" onClick={() => handleEditUser(params.row)}>
                                                 <EditIcon />
                                             </IconButton>
-                                            <IconButton
-                                                color="error"
-                                                onClick={() => handleDeleteUser(params.row)}
-                                            >
+                                            <IconButton color="error" onClick={() => handleDeleteUser(params.row)}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </>
@@ -339,9 +336,7 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                             rowsPerPageOptions={[5, 10]}
                         />
                     ) : (
-                        <Typography>
-                            Aucun utilisateur trouvé pour cette entreprise.
-                        </Typography>
+                        <Typography>Aucun utilisateur trouvé pour cette entreprise.</Typography>
                     )}
                 </DialogContent>
                 <DialogActions>
@@ -358,16 +353,10 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                 aria-labelledby="confirm-user-delete-title"
                 aria-describedby="confirm-user-delete-description"
             >
-                <DialogTitle id="confirm-user-delete-title">
-                    Confirmation de suppression
-                </DialogTitle>
+                <DialogTitle id="confirm-user-delete-title">Confirmation de suppression</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="confirm-user-delete-description">
-                        Êtes-vous sûr de vouloir supprimer l'utilisateur{" "}
-                        <strong>
-                            {userToDelete?.nom} {userToDelete?.prenom}
-                        </strong>{" "}
-                        ?
+                        Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>{userToDelete?.nom} {userToDelete?.prenom}</strong> ?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -414,11 +403,9 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                                 setEditingAbonnement(updatedData);
                             })
                             .catch((error) => console.error("Erreur lors de la mise à jour de l'abonnement :", error));
-
                         setOpenAbonnementForm(false);
                         setEditingAbonnement(null);
                     }}
-
                     initialData={editingAbonnement}
                     open={openAbonnementForm}
                     handleClose={() => {
@@ -428,7 +415,7 @@ const EntrepriseList = ({ entreprises, onDelete, onEdit }) => {
                 />
             )}
 
-            {/* Dialog pour afficher le message si l'entreprise n'a pas d'abonnement */}
+            {/* Dialog pour afficher un message si l'entreprise n'a pas d'abonnement */}
             <Dialog
                 open={openNoAbonnementDialog}
                 onClose={() => setOpenNoAbonnementDialog(false)}
