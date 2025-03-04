@@ -4,14 +4,14 @@ import CustomModal from "../../components/common/CustomModal";
 import CustomButton from "../../components/common/CustomButton";
 import { getEntreprises } from "../../services/EntrepriseService";
 
-const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
+const UserForm = ({ onSubmit, initialData, defaultEntreprise, open, handleClose }) => {
     const [formValues, setFormValues] = useState({
         email: "",
         nom: "",
         prenom: "",
         password: "",
         typeUtilisateur: "USER",
-        entreprise: null,
+        entreprise: defaultEntreprise || null,
     });
 
     const [entreprises, setEntreprises] = useState([]);
@@ -29,7 +29,7 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
         fetchEntreprises();
     }, []);
 
-    // Charger les données de l'utilisateur en modification
+    // Charger les données de l'utilisateur en modification ou pré-remplir pour un ajout
     useEffect(() => {
         if (open) {
             if (initialData) {
@@ -37,27 +37,26 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
                     email: initialData.email || "",
                     nom: initialData.nom || "",
                     prenom: initialData.prenom || "",
-                    password: "", // 🔹 Pas de mot de passe par défaut en mode édition
+                    password: "", // Pas de mot de passe par défaut en mode édition
                     typeUtilisateur: initialData.typeUtilisateur || "USER",
                     entreprise: initialData.entreprise
                         ? entreprises.find((e) => e.id.toString() === initialData.entreprise.toString()) || null
                         : null,
                 });
             } else {
-                // Réinitialiser pour un nouvel utilisateur
+                // Mode ajout : utiliser defaultEntreprise si fournie
                 setFormValues({
                     email: "",
                     nom: "",
                     prenom: "",
                     password: "",
                     typeUtilisateur: "USER",
-                    entreprise: null,
+                    entreprise: defaultEntreprise || null,
                 });
             }
         }
-    }, [initialData, open, entreprises]); // 🔹 Se déclenche uniquement lorsque la modale s'ouvre
+    }, [initialData, open, entreprises, defaultEntreprise]);
 
-    // Gérer les changements dans les champs
     const handleChange = (e) => {
         setFormValues({ ...formValues, [e.target.name]: e.target.value });
     };
@@ -65,11 +64,11 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onSubmit({
-            id: initialData?.id, // 🔹 Ajoute l'ID de l'utilisateur s'il est en modification
+            id: initialData?.id,
             email: formValues.email,
             nom: formValues.nom,
             prenom: formValues.prenom,
-            password: formValues.password || undefined, // 🔹 Ne pas envoyer de mot de passe vide
+            password: formValues.password || undefined,
             entreprise: formValues.entreprise ? formValues.entreprise.id : null,
             typeUtilisateur: formValues.typeUtilisateur,
         });
@@ -77,7 +76,11 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
     };
 
     return (
-        <CustomModal open={open} handleClose={handleClose} title={initialData ? "Modifier un utilisateur" : "Ajouter un utilisateur"}>
+        <CustomModal
+            open={open}
+            handleClose={handleClose}
+            title={initialData ? "Modifier un utilisateur" : "Ajouter un utilisateur"}
+        >
             <form onSubmit={handleSubmit}>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
@@ -119,7 +122,7 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
                             name="password"
                             value={formValues.password}
                             onChange={handleChange}
-                            required={!initialData} // 🔹 Obligatoire seulement en création
+                            required={!initialData}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -127,8 +130,12 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
                             options={entreprises}
                             getOptionLabel={(option) => option.name || ""}
                             value={formValues.entreprise}
-                            onChange={(event, newValue) => setFormValues({ ...formValues, entreprise: newValue })}
-                            renderInput={(params) => <TextField {...params} label="Sélectionner une entreprise" fullWidth />}
+                            onChange={(event, newValue) =>
+                                setFormValues({ ...formValues, entreprise: newValue })
+                            }
+                            renderInput={(params) => (
+                                <TextField {...params} label="Sélectionner une entreprise" fullWidth />
+                            )}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -144,7 +151,9 @@ const UserForm = ({ onSubmit, initialData, open, handleClose }) => {
                         </Select>
                     </Grid>
                     <Grid item xs={12}>
-                        <CustomButton type="submit" fullWidth>{initialData ? "Modifier" : "Ajouter"}</CustomButton>
+                        <CustomButton type="submit" fullWidth>
+                            {initialData ? "Modifier" : "Ajouter"}
+                        </CustomButton>
                     </Grid>
                 </Grid>
             </form>
