@@ -10,6 +10,7 @@ import MyAbonnement from "./abonnement/myAbonnement";
 import { Container, Typography } from "@mui/material";
 import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardTabs from "./DashboardTabs";
+import MyCompagnyPage from "./entreprise/MyCompagnyPage";
 
 const pageVariants = {
     initial: { opacity: 0, x: 50 },
@@ -139,6 +140,26 @@ const DashboardPage = () => {
                                 }
                             />
                         </Route>
+
+                        <Route element={ <ProtectedRoute allowedRoles={["ADMIN"]} /> }>
+                            <Route
+                                path="mycompagny"
+                                element={
+                                    <motion.div
+                                        initial="initial"
+                                        animate="in"
+                                        exit="out"
+                                        variants={pageVariants}
+                                        transition={pageTransition}
+                                    >
+                                        <MyCompagnyPage />
+                                    </motion.div>
+                                }
+                            />
+
+                        </Route>
+
+
 
                     </Routes>
 

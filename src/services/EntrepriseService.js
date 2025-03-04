@@ -18,6 +18,13 @@ export const updateEntreprise = async (id, updatedData) => {
     return response.data; // Retourne l'entreprise mis à jour
 };
 
+// Récupérer une entreprise
+export const getEntreprise = async (uuid) => {
+    const response = await api.get(`/entreprise/get/${uuid}`);
+    return response.data;
+};
+
+
 // Supprimer une entreprise
 export const deleteEntreprise = async (uuid) => {
     const response = await api.delete(`/entreprise/delete/${uuid}`);

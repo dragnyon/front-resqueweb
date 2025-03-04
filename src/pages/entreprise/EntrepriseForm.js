@@ -4,7 +4,7 @@ import CustomModal from "../../components/common/CustomModal";
 import CustomButton from "../../components/common/CustomButton";
 import { getAbonnements } from "../../services/AbonnementService";
 
-const EntrepriseForm = ({ onSubmit, initialData, open, handleClose }) => {
+const EntrepriseForm = ({ onSubmit, initialData, open, handleClose, disableAbonnement }) => {
     const [mail, setMail] = useState("");
     const [name, setName] = useState("");
     const [selectedAbonnement, setSelectedAbonnement] = useState(null);
@@ -28,16 +28,18 @@ const EntrepriseForm = ({ onSubmit, initialData, open, handleClose }) => {
             setMail(initialData.mail);
             setName(initialData.name);
             setAdresse(initialData.adresse || "");
-            setSelectedAbonnement(
-                abonnements.find((ab) => ab.id.toString() === initialData.abonnement?.toString()) || null
-            );
+            // Récupération de l'abonnement associé (pour affichage en lecture seule si disableAbonnement est true)
+            const abo = abonnements.find(
+                (ab) => ab.id.toString() === initialData.abonnement?.toString()
+            ) || null;
+            setSelectedAbonnement(abo);
         } else {
             setMail("");
             setName("");
             setAdresse("");
             setSelectedAbonnement(null);
         }
-    }, [initialData, open, abonnements]);
+    }, [initialData, open, abonnements, disableAbonnement]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -51,29 +53,71 @@ const EntrepriseForm = ({ onSubmit, initialData, open, handleClose }) => {
     };
 
     return (
-        <CustomModal open={open} handleClose={handleClose} title={initialData ? "Modifier une entreprise" : "Ajouter une entreprise"}>
+        <CustomModal
+            open={open}
+            handleClose={handleClose}
+            title={initialData ? "Modifier une entreprise" : "Ajouter une entreprise"}
+        >
             <form onSubmit={handleSubmit}>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
-                        <TextField fullWidth label="Email" type="email" value={mail} onChange={(e) => setMail(e.target.value)} required />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField fullWidth label="Nom" value={name} onChange={(e) => setName(e.target.value)} required />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Autocomplete
-                            options={abonnements}
-                            getOptionLabel={(option) => `${option.periodicite} - ${option.dateDebut.substring(0, 10)}`}
-                            value={selectedAbonnement}
-                            onChange={(event, newValue) => setSelectedAbonnement(newValue)}
-                            renderInput={(params) => <TextField {...params} label="Sélectionner un abonnement" fullWidth />}
+                        <TextField
+                            fullWidth
+                            label="Email"
+                            type="email"
+                            value={mail}
+                            onChange={(e) => setMail(e.target.value)}
+                            required
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField fullWidth label="Adresse" value={adresse} onChange={(e) => setAdresse(e.target.value)} />
+                        <TextField
+                            fullWidth
+                            label="Nom"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </Grid>
+                    {/* Affichage du champ abonnement selon disableAbonnement */}
+                    {!disableAbonnement ? (
+                        <Grid item xs={12}>
+                            <Autocomplete
+                                options={abonnements}
+                                getOptionLabel={(option) => `${option.periodicite} - ${option.dateDebut.substring(0, 10)}`}
+                                value={selectedAbonnement}
+                                onChange={(event, newValue) => setSelectedAbonnement(newValue)}
+                                renderInput={(params) => (
+                                    <TextField {...params} label="Sélectionner un abonnement" fullWidth />
+                                )}
+                            />
+                        </Grid>
+                    ) : (
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Abonnement"
+                                value={
+                                    selectedAbonnement
+                                        ? `${selectedAbonnement.periodicite} - ${selectedAbonnement.dateDebut.substring(0, 10)}`
+                                        : "Aucun abonnement"
+                                }
+                                disabled
+                            />
+                        </Grid>
+                    )}
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            label="Adresse"
+                            value={adresse}
+                            onChange={(e) => setAdresse(e.target.value)}
+                        />
                     </Grid>
                     <Grid item xs={12}>
-                        <CustomButton type="submit" fullWidth>{initialData ? "Modifier" : "Ajouter"}</CustomButton>
+                        <CustomButton type="submit" fullWidth>
+                            {initialData ? "Modifier" : "Ajouter"}
+                        </CustomButton>
                     </Grid>
                 </Grid>
             </form>
