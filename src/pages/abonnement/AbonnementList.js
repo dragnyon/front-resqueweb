@@ -1,6 +1,5 @@
-// src/pages/AbonnementList.js
 import React, { useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbarContainer } from "@mui/x-data-grid";
 import {
     IconButton,
     Dialog,
@@ -13,6 +12,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
 
 const DataGridContainer = styled(Box)(({ theme }) => ({
@@ -76,9 +76,10 @@ const localeText = {
     footerPaginationRowsPerPage: "Lignes par page :",
 };
 
-const AbonnementList = ({ abonnements, onDelete, onEdit }) => {
+const AbonnementList = ({ abonnements, onDelete, onEdit, onAdd }) => {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [abonnementToDelete, setAbonnementToDelete] = useState(null);
+    const [selectionModel, setSelectionModel] = useState([]);
 
     const handleOpenConfirm = (abonnement) => {
         setAbonnementToDelete(abonnement);
@@ -118,18 +119,10 @@ const AbonnementList = ({ abonnements, onDelete, onEdit }) => {
                 params.value ? params.value.substring(0, 10) : "N/A",
         },
         { field: "id", headerName: "UUID", flex: 1 },
-        { field: "periodicite", headerName: "Périodicité", flex: 1 },
         {
             field: "nbUtilisateur",
             headerName: "Nombre d'utilisateurs",
             flex: 1,
-        },
-        {
-            field: "renouvellementAuto",
-            headerName: "Renouvellement",
-            flex: 1,
-            valueFormatter: (params) =>
-                typeof params.value === "boolean" ? (params.value ? "Oui" : "Non") : "N/A",
         },
         {
             field: "nbJourRestant",
@@ -150,7 +143,9 @@ const AbonnementList = ({ abonnements, onDelete, onEdit }) => {
             headerName: "État",
             flex: 1,
             valueFormatter: (params) =>
-                typeof params.value === "boolean" ? (params.value ? "Actif" : "Inactif") : "N/A",
+                typeof params.value === "boolean"
+                    ? (params.value ? "Actif" : "Inactif")
+                    : "N/A",
         },
         {
             field: "actions",
@@ -174,6 +169,28 @@ const AbonnementList = ({ abonnements, onDelete, onEdit }) => {
         },
     ];
 
+    // Toolbar améliorée pour une meilleure intégration dans la DataGrid
+    const CustomToolbar = () => (
+        <GridToolbarContainer
+            sx={{
+                backgroundColor: "rgba(0, 0, 0, 0.04)",
+                padding: "8px",
+                borderBottom: "1px solid #ccc",
+            }}
+        >
+            {/* On ajoute un espace pour occuper toute la largeur */}
+            <Box sx={{ flexGrow: 1 }} />
+            <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={onAdd}
+            >
+                Ajouter un abonnement
+            </Button>
+        </GridToolbarContainer>
+    );
+
     return (
         <>
             <DataGridContainer>
@@ -184,6 +201,9 @@ const AbonnementList = ({ abonnements, onDelete, onEdit }) => {
                     rowsPerPageOptions={[5, 10, 20]}
                     disableSelectionOnClick
                     localeText={localeText}
+                    selectionModel={selectionModel}
+                    onSelectionModelChange={(newSelection) => setSelectionModel(newSelection)}
+                    slots={{ toolbar: CustomToolbar }}
                     sx={{
                         border: "none",
                         "& .MuiDataGrid-cell:hover": {

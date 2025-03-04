@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Select, MenuItem, Grid } from "@mui/material";
+import { TextField, Grid } from "@mui/material";
 import CustomModal from "../../components/common/CustomModal";
 import CustomButton from "../../components/common/CustomButton";
 
 const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
     const [dateDebut, setDateDebut] = useState("");
     const [dateFin, setDateFin] = useState("");
-    const [periodicite, setPeriodicite] = useState("");
     const [nbUtilisateurs, setNbUtilisateurs] = useState("");
-    const [renouvellementAuto, setRenouvellementAuto] = useState("false");
 
     // Champs calculés en lecture seule
     const [computedNbJours, setComputedNbJours] = useState("");
@@ -19,18 +17,14 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
         if (initialData) {
             setDateDebut(initialData.dateDebut ? initialData.dateDebut.substring(0, 10) : "");
             setDateFin(initialData.dateFin ? initialData.dateFin.substring(0, 10) : "");
-            setPeriodicite(initialData.periodicite);
             setNbUtilisateurs(initialData.nbUtilisateur.toString());
-            setRenouvellementAuto(initialData.renouvellementAuto.toString());
             setComputedNbJours(initialData.nbJourRestant.toString());
             setComputedPrix(initialData.prix.toString());
             setComputedEstActif(initialData.estActif ? "Actif" : "Inactif");
         } else {
             setDateDebut("");
             setDateFin("");
-            setPeriodicite("");
             setNbUtilisateurs("");
-            setRenouvellementAuto("false");
             setComputedNbJours("");
             setComputedPrix("");
             setComputedEstActif("");
@@ -68,9 +62,7 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
             id: initialData?.id,
             dateDebut: new Date(dateDebut).toISOString(),
             dateFin: new Date(dateFin).toISOString(),
-            periodicite,
             nbUtilisateur: Number(nbUtilisateurs),
-            renouvellementAuto: renouvellementAuto === "true",
             nbJourRestant: Number(computedNbJours),
             prix: Number(computedPrix),
             estActif: computedEstActif === "Actif",
@@ -105,23 +97,6 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
                         />
                     </Grid>
 
-                    {/* Périodicité */}
-                    <Grid item xs={12}>
-                        <Select
-                            fullWidth
-                            value={periodicite}
-                            onChange={(e) => setPeriodicite(e.target.value)}
-                            displayEmpty
-                            required
-                        >
-                            <MenuItem value="" disabled>
-                                Sélectionner la périodicité
-                            </MenuItem>
-                            <MenuItem value="Mensuel">Mensuel</MenuItem>
-                            <MenuItem value="Annuel">Annuel</MenuItem>
-                        </Select>
-                    </Grid>
-
                     {/* Nombre d'utilisateurs */}
                     <Grid item xs={12}>
                         <TextField
@@ -132,19 +107,6 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
                             onChange={(e) => setNbUtilisateurs(e.target.value)}
                             required
                         />
-                    </Grid>
-
-                    {/* Renouvellement automatique */}
-                    <Grid item xs={12}>
-                        <Select
-                            fullWidth
-                            value={renouvellementAuto}
-                            onChange={(e) => setRenouvellementAuto(e.target.value)}
-                            required
-                        >
-                            <MenuItem value="true">Oui</MenuItem>
-                            <MenuItem value="false">Non</MenuItem>
-                        </Select>
                     </Grid>
 
                     {/* Champs calculés (non modifiables) */}
