@@ -8,7 +8,7 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
     const [dateFin, setDateFin] = useState("");
     const [nbUtilisateurs, setNbUtilisateurs] = useState("");
 
-    // Champs calculés en lecture seule
+    // Champs calculés (affichage uniquement)
     const [computedNbJours, setComputedNbJours] = useState("");
     const [computedPrix, setComputedPrix] = useState("");
     const [computedEstActif, setComputedEstActif] = useState("");
@@ -17,10 +17,20 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
         if (initialData) {
             setDateDebut(initialData.dateDebut ? initialData.dateDebut.substring(0, 10) : "");
             setDateFin(initialData.dateFin ? initialData.dateFin.substring(0, 10) : "");
-            setNbUtilisateurs(initialData.nbUtilisateur.toString());
-            setComputedNbJours(initialData.nbJourRestant.toString());
-            setComputedPrix(initialData.prix.toString());
-            setComputedEstActif(initialData.estActif ? "Actif" : "Inactif");
+            setNbUtilisateurs(initialData.nbUtilisateur ? initialData.nbUtilisateur.toString() : "");
+            // Si initialData contient déjà les valeurs calculées, on peut les afficher
+            if (initialData.dateDebut && initialData.dateFin && initialData.nbUtilisateur) {
+                const dDebut = new Date(initialData.dateDebut);
+                const dFin = new Date(initialData.dateFin);
+                const diffTime = dFin.getTime() - dDebut.getTime();
+                const diffDays = diffTime > 0 ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : 0;
+                setComputedNbJours(diffDays.toString());
+                const price = Number(initialData.nbUtilisateur) * diffDays * 0.5;
+                setComputedPrix(price.toString());
+                const now = new Date();
+                const actif = now >= dDebut && now <= dFin;
+                setComputedEstActif(actif ? "Actif" : "Inactif");
+            }
         } else {
             setDateDebut("");
             setDateFin("");
@@ -32,22 +42,16 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
     }, [initialData, open]);
 
     useEffect(() => {
-        if (dateDebut && dateFin) {
+        if (dateDebut && dateFin && nbUtilisateurs) {
             const dDebut = new Date(dateDebut);
             const dFin = new Date(dateFin);
             const diffTime = dFin.getTime() - dDebut.getTime();
             const diffDays = diffTime > 0 ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : 0;
             setComputedNbJours(diffDays.toString());
-
-            if (nbUtilisateurs) {
-                const price = Number(nbUtilisateurs) * diffDays * 0.5;
-                setComputedPrix(price.toString());
-            } else {
-                setComputedPrix("");
-            }
-
+            const price = Number(nbUtilisateurs) * diffDays * 0.5;
+            setComputedPrix(price.toString());
             const now = new Date();
-            const actif = (now >= dDebut && now <= dFin) || diffDays > 0;
+            const actif = now >= dDebut && now <= dFin;
             setComputedEstActif(actif ? "Actif" : "Inactif");
         } else {
             setComputedNbJours("");
@@ -58,14 +62,11 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        // On envoie uniquement les trois informations attendues par l'API.
         onSubmit({
-            id: initialData?.id,
             dateDebut: new Date(dateDebut).toISOString(),
             dateFin: new Date(dateFin).toISOString(),
             nbUtilisateur: Number(nbUtilisateurs),
-            nbJourRestant: Number(computedNbJours),
-            prix: Number(computedPrix),
-            estActif: computedEstActif === "Actif",
         });
         handleClose();
     };
@@ -96,7 +97,6 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
                             required
                         />
                     </Grid>
-
                     {/* Nombre d'utilisateurs */}
                     <Grid item xs={12}>
                         <TextField
@@ -108,18 +108,16 @@ const AbonnementForm = ({ onSubmit, initialData, open, handleClose }) => {
                             required
                         />
                     </Grid>
-
-                    {/* Champs calculés (non modifiables) */}
-                    <Grid item xs={6}>
+                    {/* Affichage des champs calculés (lecture seule) */}
+                    <Grid item xs={4}>
                         <TextField fullWidth label="Jours restants (calculé)" value={computedNbJours} disabled />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={4}>
                         <TextField fullWidth label="Prix (calculé)" value={computedPrix} disabled />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={4}>
                         <TextField fullWidth label="État (calculé)" value={computedEstActif} disabled />
                     </Grid>
-
                     {/* Bouton de soumission */}
                     <Grid item xs={12}>
                         <CustomButton type="submit" fullWidth>
