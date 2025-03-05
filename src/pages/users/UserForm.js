@@ -7,7 +7,7 @@ import { getEntreprises } from "../../services/EntrepriseService";
 const UserForm = ({
                       onSubmit,
                       initialData,
-                      defaultEntreprise,
+                      defaultEntreprise, // Peut être un id ou un objet entreprise
                       open,
                       handleClose,
                       disableEntreprise = false,
@@ -19,11 +19,12 @@ const UserForm = ({
         prenom: "",
         password: "",
         typeUtilisateur: "USER",
-        entreprise: defaultEntreprise || null,
+        entreprise: null,
     });
 
     const [entreprises, setEntreprises] = useState([]);
 
+    // Récupération de la liste des entreprises
     useEffect(() => {
         const fetchEntreprises = async () => {
             try {
@@ -36,34 +37,49 @@ const UserForm = ({
         fetchEntreprises();
     }, []);
 
+    // Lors de l'ouverture de la modal, initialiser le formulaire selon le mode édition ou ajout.
     useEffect(() => {
         if (open) {
             if (initialData) {
+                // Mode édition : préremplissage avec les données existantes
                 setFormValues({
                     email: initialData.email || "",
                     nom: initialData.nom || "",
                     prenom: initialData.prenom || "",
                     password: "",
-                    // Utilisation directe de la valeur initiale sans fallback par "USER"
                     typeUtilisateur: initialData.typeUtilisateur,
                     entreprise: initialData.entreprise
                         ? entreprises.find(
-                        (e) => e.id.toString() === initialData.entreprise.toString()
+                        (e) =>
+                            e.id.toString() === initialData.entreprise.toString()
                     ) || null
                         : null,
                 });
             } else {
+                // Mode ajout : forcer typeUtilisateur à "USER" et préremplir le champ entreprise
+                let defaultEnt = null;
+                if (defaultEntreprise && entreprises.length > 0) {
+                    // Si defaultEntreprise est un objet (ayant la propriété id), l'utiliser directement
+                    if (typeof defaultEntreprise === "object" && defaultEntreprise.id) {
+                        defaultEnt = defaultEntreprise;
+                    } else {
+                        // Sinon, rechercher l'entreprise dont l'id correspond
+                        defaultEnt = entreprises.find(
+                            (e) => e.id.toString() === defaultEntreprise.toString()
+                        );
+                    }
+                }
                 setFormValues({
                     email: "",
                     nom: "",
                     prenom: "",
                     password: "",
                     typeUtilisateur: "USER",
-                    entreprise: defaultEntreprise || null,
+                    entreprise: defaultEnt,
                 });
             }
         }
-    }, [initialData, open, entreprises, defaultEntreprise]);
+    }, [open, initialData, entreprises, defaultEntreprise]);
 
     const handleChange = (e) => {
         setFormValues({ ...formValues, [e.target.name]: e.target.value });
@@ -71,15 +87,19 @@ const UserForm = ({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Si disableTypeUtilisateur est true, forçons la valeur avec celle d'initialData
         const submittedData = {
             id: initialData?.id,
             email: formValues.email,
             nom: formValues.nom,
             prenom: formValues.prenom,
             password: formValues.password || undefined,
+            // On soumet l'id de l'entreprise sélectionnée
             entreprise: formValues.entreprise ? formValues.entreprise.id : null,
-            typeUtilisateur: disableTypeUtilisateur ? initialData.typeUtilisateur : formValues.typeUtilisateur,
+            typeUtilisateur: disableTypeUtilisateur
+                ? initialData
+                    ? initialData.typeUtilisateur
+                    : "USER"
+                : formValues.typeUtilisateur,
         };
         onSubmit(submittedData);
         handleClose();

@@ -1,4 +1,3 @@
-// src/pages/users/MyUsersPage.js
 import React, { useState, useContext } from "react";
 import { Container, Typography, Paper, Box } from "@mui/material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,16 +13,14 @@ const MyUsersPage = () => {
     const [editingUser, setEditingUser] = useState(null);
     const [openUserForm, setOpenUserForm] = useState(false);
 
-    // On considère qu'on est en mode "ajout" si aucun utilisateur n'est passé en modification
+    // Mode ajout si editingUser est null
     const isAdding = editingUser === null;
 
-    // Récupération des utilisateurs de l'entreprise via getUsersByCompany
     const { data: users = [], isLoading, isError } = useQuery({
         queryKey: ["myUsers"],
         queryFn: getUsersByCompany,
     });
 
-    // Mutation pour ajouter ou modifier un utilisateur
     const userMutation = useMutation({
         mutationFn: (userData) =>
             editingUser ? updateUser(editingUser.id, userData) : createUser(userData),
@@ -34,17 +31,14 @@ const MyUsersPage = () => {
         },
     });
 
-    // Mutation pour supprimer un utilisateur
     const deleteMutation = useMutation({
         mutationFn: deleteUser,
         onSuccess: () => queryClient.invalidateQueries(["myUsers"]),
     });
 
-    const handleAddUser = (userData) => userMutation.mutate(userData);
-    const handleDeleteUser = (id) => deleteMutation.mutate(id);
-
-    // Pour l'ajout, on n'envoie pas d'utilisateur, ce qui déclenche l'utilisation des props "defaultEntreprise" et "disableXXX"
-    const handleOpenUserForm = (user = null) => {
+    // Cette fonction ouvre la modal.
+    // Pour l'ajout, on passera explicitement null.
+    const handleOpenUserForm = (user) => {
         setEditingUser(user);
         setOpenUserForm(true);
     };
@@ -70,22 +64,22 @@ const MyUsersPage = () => {
             <Paper sx={{ p: 3, mb: 4 }}>
                 <UserList
                     users={users}
-                    onDelete={handleDeleteUser}
+                    onDelete={(id) => deleteMutation.mutate(id)}
                     onEdit={handleOpenUserForm}
-                    onAdd={handleOpenUserForm}
+                    // On force ici l'appel de handleOpenUserForm avec null pour passer en mode ajout
+                    onAdd={() => handleOpenUserForm(null)}
                 />
             </Paper>
 
             <UserForm
-                onSubmit={handleAddUser}
+                onSubmit={(userData) => userMutation.mutate(userData)}
                 initialData={editingUser}
                 open={openUserForm}
                 handleClose={() => setOpenUserForm(false)}
-                // Pour l'ajout : pré-sélectionner et bloquer l'entreprise (celle de l'utilisateur connecté)
-                // et forcer le type sur "USER"
-                defaultEntreprise={isAdding ? userInfo?.entreprise : undefined}
-                disableEntreprise={isAdding}
-                disableTypeUtilisateur={isAdding}
+                // En mode ajout, on passe l'id de l'entreprise de l'utilisateur connecté
+                defaultEntreprise={isAdding ? userInfo?.entrepriseId : undefined}
+                disableEntreprise={true}
+                disableTypeUtilisateur={true}
             />
         </Container>
     );
