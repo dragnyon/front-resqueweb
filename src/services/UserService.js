@@ -24,6 +24,12 @@ export const updateUser = async (id, updatedData) => {
     return response.data;
 };
 
+// Mettre à jour le mot de passe d'un utilisateur
+export const updateUserPassword = async (id, passwordData) => {
+    const response = await api.put(`/utilisateurs/updatePassword/${id}`, passwordData);
+    return response.data;
+};
+
 // Supprimer un utilisateur
 export const deleteUser = async (uuid) => {
     const response = await api.delete(`/utilisateurs/${uuid}`);

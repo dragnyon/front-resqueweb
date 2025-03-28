@@ -144,17 +144,20 @@ const UserForm = ({
                             required
                         />
                     </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            label="Mot de passe"
-                            type="password"
-                            name="password"
-                            value={formValues.password}
-                            onChange={handleChange}
-                            required={!initialData}
-                        />
-                    </Grid>
+                    {!initialData && (
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Mot de passe"
+                                type="password"
+                                name="password"
+                                value={formValues.password}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Grid>
+                    )}
+
                     <Grid item xs={12}>
                         <Autocomplete
                             disabled={disableEntreprise}
